@@ -1,0 +1,5 @@
+outs:
+- md5: 60a7b88e603ca6379349ecf4851032d6
+  size: 14
+  hash: md5
+  path: asset.txt

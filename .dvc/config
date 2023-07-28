@@ -1,0 +1,5 @@
+['remote "localdvc"']
+    url = ../localdvc
+[core]
+    autostage = true
+    remote = localdvc

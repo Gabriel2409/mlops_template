@@ -7,7 +7,12 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+## DVC
+
 - init dvc: `dvc init`
+
+### Local file system
+
 - use the standard config to push and pull from local file system:
 
 ```bash
@@ -15,6 +20,10 @@ dvc add data/asset.txt
 git commit -m "added file to local storage"
 dvc push
 ```
+
+### Azure blob storage
+
+- you can manually deploy the azure infrastructure with `az deployment group create --resource-group mlops_exps --template-file infrastructure/main.bicep --parameters infrastructure/default_parameters.bicepparam`
 
 - if you have a storage on azure instead:
 
@@ -31,6 +40,8 @@ then in the .dvc/.config.local file:
 [core]
     remote = blob
 ```
+
+Note that you can get the connection string:  `az storage account show-connection-string --name mlopsstorage124fxgc --key key1`
 
 config.local is not committed to source control and is used in priority
 

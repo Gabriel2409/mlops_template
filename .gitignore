@@ -10,8 +10,11 @@ conf/local/**
 conf/**/*credentials*
 
 # ignore everything in the following folders
-/data/
 logs/**
+localdvc/
+
+# ignore csv files
+*.csv
 
 # except their sub-folders
 !/data/**/*.dvc

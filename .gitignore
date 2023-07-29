@@ -14,7 +14,7 @@ conf/**/*credentials*
 logs/**
 
 # except their sub-folders
-!**/*.dvc
+!/data/**/*.dvc
 !logs/**/
 
 # also keep all .gitkeep files

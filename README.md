@@ -1,3 +1,7 @@
+# Mlops template
+
+Heavily inspired by https://madewithml.com/
+
 - First install
 
 ```bash
@@ -41,7 +45,7 @@ then in the .dvc/.config.local file:
     remote = blob
 ```
 
-Note that you can get the connection string:  `az storage account show-connection-string --name mlopsstorage124fxgc --key key1`
+Note that you can get the connection string: `az storage account show-connection-string --name mlopsstorage124fxgc --key key1`
 
 config.local is not committed to source control and is used in priority
 

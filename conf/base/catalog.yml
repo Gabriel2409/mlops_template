@@ -3,14 +3,32 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
 
-
 projects_raw:
   type: pandas.CSVDataSet
   filepath: data/01_raw/dataset.csv
-
 
 projects_text:
   type: pandas.CSVDataSet
   filepath: data/02_intermediate/projects_text.csv
 
+dummy_classifier:
+  type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+  flavor: mlflow.sklearn
 
+## -------- MLFLOW METRICS -----------
+
+mlflow_metrics:
+  type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
+  # key: my_metric
+
+mlflow_classification_report:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: pandas.CSVDataSet
+    filepath: classification_report.csv
+
+mlflow_confusion_matrix:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: text.TextDataSet
+    filepath: confusion_matrix.txt

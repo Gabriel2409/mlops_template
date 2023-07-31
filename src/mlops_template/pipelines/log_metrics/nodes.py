@@ -2,12 +2,12 @@
 This is a boilerplate pipeline 'log_metrics'
 generated using Kedro 0.18.11
 """
-import pandas as pd
-import numpy as np
+import logging
 from typing import Dict, List, Tuple
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
+
 import numpy as np
+import pandas as pd
+from sklearn.metrics import classification_report, confusion_matrix
 
 
 def log_main_scores(
@@ -32,4 +32,8 @@ def log_main_scores(
             metrics[f"{average}_{score}"] = [
                 {"value": report[average][score], "step": 0}
             ]
+
+    log = logging.getLogger(__name__)
+    log.info(f'Macro F1 Score: {report["macro avg"]["f1-score"]}')
+    log.info(f'Weighted F1 Score: {report["weighted avg"]["f1-score"]}')
     return metrics, pd.DataFrame(report), np.array2string(cm)

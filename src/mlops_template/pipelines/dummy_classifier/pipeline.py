@@ -4,9 +4,11 @@ generated using Kedro 0.18.11
 """
 
 from kedro.pipeline import Pipeline, node
-from .nodes import fit_dummy_classifier
 from kedro.pipeline.modular_pipeline import pipeline
+
 from mlops_template.pipelines import log_metrics
+
+from .nodes import fit_dummy_classifier
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -22,5 +24,5 @@ def create_pipeline(**kwargs) -> Pipeline:
     ) + pipeline(
         pipe=log_metrics.create_pipeline(),
         # inputs={"y_true": "y_true", "y_pred": "y_pred"},
-        # outputs={"metrics": "dummy_metrics"},
+        # outputs={},
     )

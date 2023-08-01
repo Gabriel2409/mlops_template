@@ -7,7 +7,6 @@ from kedro.pipeline import Pipeline
 from mlops_template.pipelines import dummy_classifier
 
 
-
 def register_pipelines() -> dict[str, Pipeline]:
     """Register the project's pipelines.
 

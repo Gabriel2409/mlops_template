@@ -8,6 +8,7 @@ jupyterlab
 jupyterlab_server
 kedro
 kedro-mlflow
+kedro-viz
 matplotlib
 mlflow
 nbstripout
@@ -19,3 +20,4 @@ pytest-cov
 pytest-mock
 scikit-learn
 seaborn
+torch

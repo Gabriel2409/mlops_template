@@ -3,13 +3,51 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
 
-projects_raw:
+
+# --- initial files - already divided in train an test ---
+projects_train_raw:
   type: pandas.CSVDataSet
   filepath: data/01_raw/dataset.csv
 
-projects_text:
+projects_test_raw:
   type: pandas.CSVDataSet
-  filepath: data/02_intermediate/projects_text.csv
+  filepath: data/01_raw/holdout.csv
+
+# files after combining title and description
+projects_train_text:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/projects_train_text.csv
+
+projects_train_text_dvc:
+  type: text.TextDataSet
+  filepath: data/02_intermediate/projects_train_text.csv.dvc
+
+dvc_train_dataset_artifact: #artifact for mlflow
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: text.TextDataSet
+    filepath: dvc_training_set.txt
+
+
+projects_test_text:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/projects_test_text.csv
+
+projects_test_text_dvc:
+  type: text.TextDataSet
+  filepath: data/02_intermediate/projects_test_text.csv.dvc
+
+dvc_test_dataset_artifact: #artifact for mlflow
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: text.TextDataSet
+    filepath: dvc_testing_set.txt
+
+label_encoder_mapping:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: json.JSONDataSet
+    filepath: label_encoder_mapping.json
 
 dummy_classifier:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
@@ -17,18 +55,33 @@ dummy_classifier:
 
 ## -------- MLFLOW METRICS -----------
 
-mlflow_metrics:
+train_mlflow_metrics:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
-  # key: my_metric
 
-mlflow_classification_report:
+train_mlflow_classification_report:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: pandas.CSVDataSet
-    filepath: classification_report.csv
+    filepath: train_classification_report.csv
 
-mlflow_confusion_matrix:
+train_mlflow_confusion_matrix:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: text.TextDataSet
-    filepath: confusion_matrix.txt
+    filepath: train_confusion_matrix.txt
+
+
+test_mlflow_metrics:
+  type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
+
+test_mlflow_classification_report:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: pandas.CSVDataSet
+    filepath: test_classification_report.csv
+
+test_mlflow_confusion_matrix:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: text.TextDataSet
+    filepath: test_confusion_matrix.txt

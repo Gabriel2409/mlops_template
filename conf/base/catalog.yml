@@ -11,6 +11,22 @@ projects_text:
   type: pandas.CSVDataSet
   filepath: data/02_intermediate/projects_text.csv
 
+projects_text_dvc:
+  type: text.TextDataSet
+  filepath: data/02_intermediate/projects_text.csv.dvc
+
+dvc_dataset:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: text.TextDataSet
+    filepath: training_set_dvc.txt
+
+label_encoder_mapping:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: json.JSONDataSet
+    filepath: label_encoder_mapping.json
+
 dummy_classifier:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
   flavor: mlflow.sklearn

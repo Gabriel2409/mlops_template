@@ -19,3 +19,4 @@ pytest-cov
 pytest-mock
 scikit-learn
 seaborn
+torch

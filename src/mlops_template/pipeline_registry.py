@@ -4,7 +4,7 @@ from __future__ import annotations
 from kedro.framework.project import find_pipelines
 from kedro.pipeline import Pipeline
 
-from mlops_template.pipelines import dummy_classifier
+from mlops_template.pipelines import dummy_classifier, log_dataset
 
 
 

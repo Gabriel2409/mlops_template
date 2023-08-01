@@ -9,7 +9,7 @@ from sklearn.dummy import DummyClassifier
 
 
 def fit_dummy_classifier(
-    df: pd.DataFrame,
+    train_df: pd.DataFrame,
     strategy: Literal[
         "most_frequent", "prior", "stratified", "uniform", "constant"
     ] = "most_frequent",
@@ -20,8 +20,10 @@ def fit_dummy_classifier(
         df (pd.DataFrame): the dataframe
     """
     dummy = DummyClassifier(strategy=strategy)
-    X = df.drop(columns=["tag"])
-    y = df["tag"]
-    dummy.fit(X, y)
 
-    return dummy, y, dummy.predict(X)
+    X_train = train_df.drop(columns=["tag"])
+    y_train = train_df["tag"]
+
+    dummy.fit(X_train, y_train)
+
+    return dummy

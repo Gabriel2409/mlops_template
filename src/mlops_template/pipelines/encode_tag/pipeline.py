@@ -13,8 +13,12 @@ def create_pipeline(**kwargs) -> Pipeline:
         nodes=[
             node(
                 func=encode_tag,
-                inputs=["df_to_encode"],
-                outputs=["encoded_df", "label_encoder_mapping"],
+                inputs=["train_df_to_encode", "test_df_to_encode"],
+                outputs=[
+                    "encoded_train_df",
+                    "encoded_test_df",
+                    "label_encoder_mapping",
+                ],
                 name="encode_tag",
             )
         ]

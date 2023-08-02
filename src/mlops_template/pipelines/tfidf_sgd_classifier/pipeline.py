@@ -8,7 +8,7 @@ from kedro.pipeline.modular_pipeline import pipeline
 
 from mlops_template.pipelines import encode_tag, log_datasets, log_sklearn_metrics
 
-from .nodes import fit_tfidf_vectorizer_and_sgdclassifier, get_features_and_target
+from .nodes import get_features_and_target, optimize_tfidf_sgd
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -45,7 +45,8 @@ def create_pipeline(**kwargs) -> Pipeline:
                     outputs=["X_test", "y_test"],
                 ),
                 node(
-                    func=fit_tfidf_vectorizer_and_sgdclassifier,
+                    # func=fit_tfidf_vectorizer_and_sgdclassifier,
+                    func=optimize_tfidf_sgd,
                     inputs=["X_train", "y_train"],
                     outputs="tfidf_sgdclassifier",
                     name="tfidf_sgdclassifier",

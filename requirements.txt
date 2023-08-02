@@ -13,6 +13,8 @@ matplotlib
 mlflow
 nbstripout
 numpy
+numpyencoder
+optuna
 pandas
 pre-commit
 pytest

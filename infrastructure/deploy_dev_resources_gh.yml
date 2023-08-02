@@ -1,0 +1,24 @@
+name: Deploy Dev resources to Azure
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - uses: actions/checkout@main
+
+        # Log into Azure
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        # Deploy ARM template
+      - name: Run ARM deploy
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./infrastructure/dev_resources.bicep
+          parameters: location=${{ secrets.AZURE_LOCATION }} baseName=mlopsgh
+
+        # output containerName variable from template
+      - run: echo ${{ steps.deploy.outputs.containerName }}

@@ -67,3 +67,17 @@ If you don't want to use a connection string, create a service principal (https:
 [core]
     remote = blob
 ```
+
+
+# github action to push arm template
+https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-github-actions?tabs=userlevel
+
+- get subscription and rg id: `az group list`
+- create a contributor service principal:
+```bash
+az ad sp create-for-rbac \
+--name "<myrgcontributorsp>" --role contributor \
+--scopes /subscriptions/<subscription-id>/resourceGroups/<group-name> \
+```
+- add full json object to github repository secrets under name AZURE_CREDENTIALS
+- also create other secrets: AZURE_SUBSCRIPTION and AZURE_RG and AZURE_LOCATION

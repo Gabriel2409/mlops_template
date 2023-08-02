@@ -78,6 +78,7 @@ https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-
 az ad sp create-for-rbac \
 --name "<myrgcontributorsp>" --role contributor \
 --scopes /subscriptions/<subscription-id>/resourceGroups/<group-name> \
+--sdk-auth
 ```
 - add full json object to github repository secrets under name AZURE_CREDENTIALS
 - also create other secrets: AZURE_SUBSCRIPTION and AZURE_RG and AZURE_LOCATION

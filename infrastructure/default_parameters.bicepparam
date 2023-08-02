@@ -2,7 +2,5 @@
 // parameters will be overriden by pipeline variables
 using 'main.bicep'
 
-param baseName = 'mlops_sample'
+param baseName = 'mlopssample'
 param location = 'westeurope'
-param saName = 'mlopsstorage124fxgc'
-param saContainerName = 'mlopscontainer'

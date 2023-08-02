@@ -1,5 +1,5 @@
 """
-This is a boilerplate pipeline 'dummy_classifier'
+This is a boilerplate pipeline 'tfidf_vectorizer'
 generated using Kedro 0.18.11
 """
 
@@ -8,7 +8,7 @@ from kedro.pipeline.modular_pipeline import pipeline
 
 from mlops_template.pipelines import encode_tag, log_datasets, log_sklearn_metrics
 
-from .nodes import fit_dummy_classifier, get_features_and_target
+from .nodes import fit_tfidf_vectorizer_and_sgdclassifier, get_features_and_target
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -45,17 +45,17 @@ def create_pipeline(**kwargs) -> Pipeline:
                     outputs=["X_test", "y_test"],
                 ),
                 node(
-                    func=fit_dummy_classifier,
-                    inputs=["X_train", "y_train", "params:strategy"],
-                    outputs="dummy_classifier",
-                    name="dummy_classifier",
+                    func=fit_tfidf_vectorizer_and_sgdclassifier,
+                    inputs=["X_train", "y_train"],
+                    outputs="tfidf_sgdclassifier",
+                    name="tfidf_sgdclassifier",
                 ),
             ]
         )
         + pipeline(
             pipe=log_sklearn_metrics.create_pipeline(),
             inputs={
-                "model": "dummy_classifier",
+                "model": "tfidf_sgdclassifier",
                 "X_train": "X_train",
                 "y_train": "y_train",
                 "X_test": "X_test",

@@ -9,27 +9,26 @@ import pandas as pd
 from sklearn.metrics import classification_report, confusion_matrix
 
 
-def log_sklearn_scores(model, train_df, test_df):
+def format_classification_report(cr: dict):
+    """transforms the classification report into a dataframe"""
+    return pd.DataFrame(cr).reset_index().rename(columns={"index": "score"})
+
+
+def log_sklearn_scores(model, X_train, y_train, X_test, y_test):
     """returns all important metrics for logging"""
-
-    X_train = train_df.drop(columns=["tag"])
-    y_train_true = train_df["tag"]
-
-    X_test = test_df.drop(columns=["tag"])
-    y_test_true = test_df["tag"]
 
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
 
-    cm_train = confusion_matrix(y_true=y_train_true, y_pred=y_train_pred)
+    cm_train = confusion_matrix(y_true=y_train, y_pred=y_train_pred)
 
     report_train: dict = classification_report(
-        y_true=y_train_true, y_pred=y_train_pred, output_dict=True
+        y_true=y_train, y_pred=y_train_pred, output_dict=True
     )
-    cm_test = confusion_matrix(y_true=y_test_true, y_pred=y_test_pred)
+    cm_test = confusion_matrix(y_true=y_test, y_pred=y_test_pred)
 
     report_test: dict = classification_report(
-        y_true=y_test_true, y_pred=y_test_pred, output_dict=True
+        y_true=y_test, y_pred=y_test_pred, output_dict=True
     )
 
     train_metrics = {}
@@ -48,9 +47,9 @@ def log_sklearn_scores(model, train_df, test_df):
     log.info(f'Test Weighted F1 Score: {report_test["weighted avg"]["f1-score"]}')
     return (
         train_metrics,
-        pd.DataFrame(report_train),
+        format_classification_report(report_train),
         np.array2string(cm_train),
         test_metrics,
-        pd.DataFrame(report_test),
+        format_classification_report(report_test),
         np.array2string(cm_test),
     )

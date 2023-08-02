@@ -13,7 +13,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         nodes=[
             node(
                 func=log_sklearn_scores,
-                inputs=["model", "train_df", "test_df"],
+                inputs=["model", "X_train", "y_train", "X_test", "y_test"],
                 outputs=[
                     "train_mlflow_metrics",
                     "train_mlflow_classification_report",

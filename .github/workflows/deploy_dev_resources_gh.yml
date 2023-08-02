@@ -1,4 +1,6 @@
 name: Deploy Dev resources to Azure
+on:
+  workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

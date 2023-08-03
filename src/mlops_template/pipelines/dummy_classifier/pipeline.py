@@ -47,7 +47,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 node(
                     func=fit_dummy_classifier,
                     inputs=["X_train", "y_train", "params:strategy"],
-                    outputs="dummy_classifier",
+                    outputs="mlflow_sklearn_classifier",
                     name="dummy_classifier",
                 ),
             ]
@@ -55,7 +55,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         + pipeline(
             pipe=log_sklearn_metrics.create_pipeline(),
             inputs={
-                "model": "dummy_classifier",
+                "model": "mlflow_sklearn_classifier",
                 "X_train": "X_train",
                 "y_train": "y_train",
                 "X_test": "X_test",

@@ -47,8 +47,12 @@ def create_pipeline(**kwargs) -> Pipeline:
                 node(
                     # func=fit_tfidf_vectorizer_and_sgdclassifier,
                     func=optimize_tfidf_sgd,
-                    inputs=["X_train", "y_train"],
-                    outputs="tfidf_sgdclassifier",
+                    inputs={
+                        "X_train": "X_train",
+                        "y_train": "y_train",
+                        "n_trials": "params:tfidf_sgd_n_trials_optuna",
+                    },
+                    outputs=["mlflow_sklearn_classifier", "optuna_best_params"],
                     name="tfidf_sgdclassifier",
                 ),
             ]
@@ -56,7 +60,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         + pipeline(
             pipe=log_sklearn_metrics.create_pipeline(),
             inputs={
-                "model": "tfidf_sgdclassifier",
+                "model": "mlflow_sklearn_classifier",
                 "X_train": "X_train",
                 "y_train": "y_train",
                 "X_test": "X_test",

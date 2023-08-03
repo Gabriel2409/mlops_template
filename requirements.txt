@@ -1,3 +1,4 @@
+azureml-mlflow
 black
 dvc[azure]
 flake8

@@ -25,5 +25,5 @@ stages:
               csmFile: "$(Build.SourcesDirectory)/infrastructure/dev_resources.bicep"
               overrideParameters: "-baseName $(BASE_NAME) -location $(AZURE_LOCATION)"
               deploymentMode: "Incremental"
-              deploymentName: "DeployPipelineTemplate"
+              deploymentName: "AzureDevResources"
             displayName: "Deploy OH resources to Azure"

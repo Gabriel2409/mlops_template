@@ -49,11 +49,16 @@ label_encoder_mapping:
     type: json.JSONDataSet
     filepath: label_encoder_mapping.json
 
-dummy_classifier:
+
+mlflow_sklearn_classifier:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
   flavor: mlflow.sklearn
 
-## -------- MLFLOW METRICS -----------
+optuna_best_params:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: json.JSONDataSet
+    filepath: best_params.json
 
 train_mlflow_metrics:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet

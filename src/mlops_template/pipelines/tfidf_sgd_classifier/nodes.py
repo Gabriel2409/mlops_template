@@ -89,6 +89,7 @@ def best_pipe_callback(study, trial):
 def optimize_tfidf_sgd(
     X_train: np.ndarray,
     y_train: pd.Series,
+    n_trials: int,
 ):
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, train_size=0.7, stratify=y_train
@@ -118,16 +119,22 @@ def optimize_tfidf_sgd(
     pruner = optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=5)
     current_run_id = mlflow.active_run().info.run_id
     study = optuna.create_study(
-        study_name=f"optuna_{current_run_id}", direction="maximize", pruner=pruner
+        study_name=f"optuna_{current_run_id}",
+        direction="maximize",
+        pruner=pruner,
     )
     mlflow_callback = MLflowCallback(
         tracking_uri=mlflow.get_tracking_uri(),
         metric_name="f1_macro",
-        mlflow_kwargs={"nested": True},
+        create_experiment=False,
+        mlflow_kwargs={
+            "nested": True,
+            "experiment_id": mlflow.active_run().info.experiment_id,
+        },
     )
     study.optimize(
         lambda trial: objective(args, trial),
-        n_trials=10,
+        n_trials=n_trials,
         callbacks=[best_pipe_callback, mlflow_callback],
     )
-    return study.user_attrs["best_pipe"]
+    return study.user_attrs["best_pipe"], study.best_params

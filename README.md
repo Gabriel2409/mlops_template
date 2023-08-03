@@ -6,6 +6,9 @@ Heavily inspired by https://madewithml.com/
 # Kedro
 https://github.com/kedro-org/kedro/issues/1271
 
+Run kedro mlflow init and in the mlflow.yaml, change traching uri to point to azure ml
+workspace if you want to develop locally. If you develop directly on aml workspace,
+no need to change tracking uri
 
 
 - First install

@@ -2,26 +2,26 @@ pr: none
 trigger: none
 
 variables:
-- group: mlops-vg
+  - group: mlops-vg
 
 stages:
-- stage: 'Dev'
-  displayName: 'Dev'
-  jobs:
-  - job: "Provision_Dev"
-    displayName: "Provision Dev resources"
-    pool:
-      vmImage: 'ubuntu-latest'
-    timeoutInMinutes: 0
-    steps:
-    - task: AzureResourceGroupDeployment@2
-      inputs:
-        azureSubscription: '$(AZURE_RM_SVC_CONNECTION)'
-        action: 'Create Or Update Resource Group'
-        resourceGroupName: '$(AZURE_RG)'
-        location: $(AZURE_LOCATION)
-        templateLocation: 'Linked artifact'
-        csmFile: '$(Build.SourcesDirectory)/environment_setup/cloud-environment.json'
-        overrideParameters: '-baseName $(BASE_NAME) -location $(AZURE_LOCATION)'
-        deploymentMode: 'Incremental'
-      displayName: 'Deploy OH resources to Azure'
+  - stage: "Dev"
+    displayName: "Dev"
+    jobs:
+      - job: "Provision_Dev"
+        displayName: "Provision Dev resources"
+        pool:
+          vmImage: "ubuntu-latest"
+        timeoutInMinutes: 0
+        steps:
+          - task: AzureResourceGroupDeployment@2
+            inputs:
+              azureSubscription: "$(AZURE_RM_SVC_CONNECTION)"
+              action: "Create Or Update Resource Group"
+              resourceGroupName: "$(AZURE_RG)"
+              location: $(AZURE_LOCATION)
+              templateLocation: "Linked artifact"
+              csmFile: "$(Build.SourcesDirectory)/infrastructure/dev_resources.bicep"
+              overrideParameters: "-baseName $(BASE_NAME) -location $(AZURE_LOCATION)"
+              deploymentMode: "Incremental"
+            displayName: "Deploy OH resources to Azure"

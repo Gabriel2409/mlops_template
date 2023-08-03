@@ -82,3 +82,13 @@ az ad sp create-for-rbac \
 ```
 - add full json object to github repository secrets under name AZURE_CREDENTIALS
 - also create other secrets: AZURE_SUBSCRIPTION and AZURE_RG and AZURE_LOCATION
+- add the repository variable BASE_NAME
+
+# azure devops to push arms template
+
+- no need to create a sp manually, instead go to project settings > service connections
+then choose Azure Resource manager and configure the SP here
+
+- Create a new variable group named mlopsvars (Pipelines / Library) and you can easily add variables.
+- Add AZURE_RG, AZURE_LOCATION, BASE_NAME and AZURE_RM_SVC_CONNECTION (the name of the connector that was just created)
+- Click on the lock to make the variables secrets

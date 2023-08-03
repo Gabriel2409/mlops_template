@@ -1,3 +1,5 @@
+# CREATE DEV ENVIRONMENT WITH GITHUB ACTIONS
+
 name: Deploy Dev resources to Azure
 on:
   workflow_dispatch:
@@ -20,7 +22,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./infrastructure/dev_resources.bicep
-          parameters: location=${{ secrets.AZURE_LOCATION }} baseName=mlopsgh
+          parameters: location=${{ secrets.AZURE_LOCATION }} baseName=${{ vars.BASE_NAME }}
 
         # output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}

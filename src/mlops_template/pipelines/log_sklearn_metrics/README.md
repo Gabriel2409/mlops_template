@@ -1,4 +1,4 @@
-# Pipeline log_metrics
+# Pipeline log_sklearn_metrics
 
 > *Note:* This is a `README.md` boilerplate generated using `Kedro 0.18.11`.
 

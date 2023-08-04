@@ -1,5 +1,5 @@
 """
-This is a boilerplate test file for pipeline 'log_metrics'
+This is a boilerplate test file for pipeline 'log_sklearn_metrics'
 generated using Kedro 0.18.11.
 Please add your pipeline tests here.
 

@@ -6,7 +6,11 @@ generated using Kedro 0.18.11
 from kedro.pipeline import Pipeline, node
 from kedro.pipeline.modular_pipeline import pipeline
 
-from mlops_template.pipelines import encode_tag, log_datasets, log_sklearn_metrics
+from mlops_template.pipelines import (
+    encode_tag,
+    log_dvc_ref_to_datasets,
+    log_sklearn_metrics,
+)
 
 from .nodes import get_features_and_target, optimize_tfidf_sgd
 
@@ -14,7 +18,7 @@ from .nodes import get_features_and_target, optimize_tfidf_sgd
 def create_pipeline(**kwargs) -> Pipeline:
     return (
         pipeline(
-            pipe=log_datasets.create_pipeline(),
+            pipe=log_dvc_ref_to_datasets.create_pipeline(),
             inputs={
                 "train_dvc_file": "projects_train_text_dvc",
                 "test_dvc_file": "projects_test_text_dvc",

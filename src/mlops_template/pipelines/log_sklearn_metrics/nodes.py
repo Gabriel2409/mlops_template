@@ -1,5 +1,5 @@
 """
-This is a boilerplate pipeline 'log_metrics'
+This is a boilerplate pipeline 'log_sklearn_metrics'
 generated using Kedro 0.18.11
 """
 import logging

@@ -8,6 +8,8 @@ jupyter
 jupyterlab
 jupyterlab_server
 kedro
+kedro-azureml[mlflow]
+kedro-docker
 kedro-mlflow
 kedro-viz
 matplotlib

@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.10-slim
+ARG BASE_IMAGE=python:3.10
 FROM $BASE_IMAGE
 
 # install project requirements

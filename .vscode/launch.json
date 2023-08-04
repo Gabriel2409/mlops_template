@@ -22,6 +22,19 @@
             "args": [
                 "run"
             ]
+        },
+        {
+            "name": "Python: Kedro Azure ML Run",
+            "cwd": "${workspaceFolder}",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "kedro",
+            "justMyCode": false,
+            "args": [
+                "azureml",
+                "run"
+            ]
         }
     ]
 }

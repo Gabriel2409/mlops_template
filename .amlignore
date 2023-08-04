@@ -1,0 +1,11 @@
+.git/
+.github/
+.pytest_cache
+.vscode
+venv/
+mlruns/
+.dvc/
+conf/
+docs/
+infrastructure/
+notebooks/

@@ -1,10 +1,10 @@
 import os
 import random
 
+import mlflow
 import numpy as np
 import torch
 from kedro.framework.hooks import hook_impl
-import mlflow
 
 SEED = 28
 
@@ -15,7 +15,7 @@ class ReproducibilityHooks:
     @hook_impl
     def before_pipeline_run(self):
         """Set seeds for reproducibility before each node run"""
-        mlflow.log_metric("seed", SEED)
+        mlflow.log_params({"seed": SEED})
         seed = SEED
         np.random.seed(seed)
         random.seed(seed)

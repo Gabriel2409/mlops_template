@@ -1,5 +1,5 @@
 """
-This is a boilerplate pipeline 'log_dataset'
+This is a boilerplate pipeline 'log_dvc_ref_to_datasets'
 generated using Kedro 0.18.11
 """
 

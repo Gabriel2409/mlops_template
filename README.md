@@ -129,6 +129,79 @@ https://kedro-mlflow.readthedocs.io/en/stable/
   either by running `mlflow.get_tracking_uri()` from a notebook directly on the workspace or
   by running `az ml workspace show -n <workspacename>`.
 
+
+## Create a custom environment to use for your compute instances and clusters
+
+- By default, azure comes with a lot of pre-configured environments that can be used as is. 
+- It is also possible to create an environment from another by adding conda dependencies. 
+- Finally, you can create your own environment from a dockerfile and push it to your 
+container registry. 
+- very nice resource: https://bea.stollnitz.com/blog/aml-environment/
+
+### kedro-docker
+
+- plugin to help create kedro docker images 
+- we are only interested in creating the environment so the process is even easier here
+- Run `kedro docker init`: this will automatically create a Dockerfile, a .dockerignore
+  and a .dive-ci file to help with kedro deployment.
+- In the docker file, remove everything except the requirements part
+- Run `kedro docker build --image=<acrname>.azurecr.io/<your_image_name>:latest`
+
+- login to the azure container registry: `az acr login --name <acrname>`
+- push the image: `docker push <acrname>.azurecr.io/<your_image_name>:latest`
+
+- Finally, create the azure ml environment:
+  `az ml environment create --name <environment-name> --image <acrname>.azurecr.io/<your_image_name>:latest`
+  You will be able to see the environment on azure ml
+
+
+### From an existing image / environment 
+
+- It is also possible to go to the azure ml studio, start from a list of curated 
+environment and customize them. 
+- It is also possible to start from a list of pre-built microsoft images:
+  https://github.com/Azure/AzureML-Containers. In this case, you can easily specify 
+  a conda-dependencies file and register a new environment
+
+```yml
+# ex cond-dependencies.yaml
+name: conda_env_test
+dependencies:
+  - python==3.10.11
+  - pip=23.2.1
+  - pip:
+      - pandas==1.1.3
+      - scikit-learn~=1.3.0
+```
+
+```python
+# register a new environment with python sdk
+from azureml.core.environment import Environment
+from azureml.core import Workspace
+ws = Workspace(
+    subscription_id="<subscription-id>",
+    resource_group="<rg>",
+    workspace_name="<ws>",
+)
+
+env = Environment.from_docker_image(
+    name='conda_env_test', 
+    image='mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest',
+    conda_specification= "conda-dependencies.yaml"
+)
+env.register(workspace=ws)
+```
+
+or from the cli: 
+
+`az ml environment create --resource-group <rg> --workspace-name <ws> --image mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest --conda-file conda-dependencies.yaml --name <env_name>`
+
+
+
+- TODO: Microsoft also has a list of prebuilt images for inference. It might be worth checking out
+
+
+
 ## Combine kedro and azure pipelines to run the code on an AML compute cluster
 
 https://kedro-azureml.readthedocs.io/en/0.4.1/source/03_quickstart.html#
@@ -140,17 +213,13 @@ https://kedro-azureml.readthedocs.io/en/0.4.1/source/03_quickstart.html#
 - Run `kedro docker init`: this will automatically create a Dockerfile, a .dockerignore
   and a .dive-ci file to help with kedro deployment.
 
-- This plugin can helop you run kedro in a docker environment locally but here, we are not
-  interested in this functionnality. We just need the base for the azureml pipelines. Therefore,
-  in the docker file, remove everything except the requirements part
-- Run `kedro docker build --image=<acrname>.azurecr.io/<your_image_name>:latest`
+- This plugin can helop you run kedro in a docker environment but it was modified to 
+create a dev  version of the dockerfile. The dev version is used with docker compose up
+then you can docker exec into the container. 
 
-- login to the azure container registry: `az acr login --name <acrname>`
-- push the image: `docker push <acrname>.azurecr.io/<your_image_name>:latest`
 
-- Finally, create the azure ml environment:
-  `az ml environment create --name <environment-name> --image <acrname>.azurecr.io/<your_image_name>:latest`
-  You will be able to see the environment on azure ml
+
+
 
 ### Use kedro-azureml to launch the training on the workspace
 

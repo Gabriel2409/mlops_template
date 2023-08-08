@@ -6,7 +6,7 @@ dependencies:
 
   - pip:
     - azureml-core
-    # - azureml-mlflow
+    - azureml-mlflow
     # - black
     - dvc[azure]
     # - flake8

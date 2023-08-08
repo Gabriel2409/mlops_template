@@ -1,4 +1,5 @@
-azureml-mlflow
+azureml-core
+# azureml-mlflow
 black
 dvc[azure]
 flake8
@@ -8,21 +9,21 @@ jupyter
 jupyterlab
 jupyterlab_server
 kedro
-kedro-azureml[mlflow]
-kedro-docker
-kedro-mlflow
+# kedro-azureml[mlflow]
+# kedro-docker
+kedro-mlflow~=0.11.9
 kedro-viz
 matplotlib
-mlflow
+mlflow~=1.27.0
 nbstripout
-numpy
+numpy~=1.23.5
 numpyencoder
-optuna
-pandas
+optuna~=3.2.0
+pandas~=2.0.3
 pre-commit
 pytest
 pytest-cov
 pytest-mock
-scikit-learn
+scikit-learn~=1.3.0
 seaborn
-torch
+# torch

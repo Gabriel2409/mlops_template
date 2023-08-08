@@ -1,0 +1,20 @@
+# use docker for local development
+version: '3.8'
+
+services:
+  kedro-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    image: kedro-dev:latest
+    container_name: kedro-dev
+    tty: true
+    stdin_open: true
+    command: [ 'sh' ]
+    volumes:
+      - ./.dvc:/app/.dvc
+      - ./conf:/conf
+      - ./data:/app/data
+      - ./src:/app/src
+    ports:
+      - 4141:4141

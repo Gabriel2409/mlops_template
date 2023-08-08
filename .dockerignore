@@ -1,23 +1,35 @@
-##########################
-# Kedro PROJECT
-
-# ignore Dockerfile and .dockerignore
 Dockerfile
+Dockerfile.dev
+Dockerfile.prod
 .dockerignore
 
-# ignore potentially sensitive credentials files
-conf/**/*credentials*
+.dvc/config.local
+.github/
+.vscode/
 
-# ignore all local configuration
+#local config
+conf/**/*credentials*
 conf/local
 !conf/local/.gitkeep
 
 # ignore everything in the following folders
-data
-logs
-notebooks
-references
-results
+data/
+docs/
+infrastructure/
+mlruns/
+notebooks/
+venv/
+logs/
+
+.amlignore
+.dive-ci
+.flake8
+.gitignore
+.dvcignore
+.pre-commit-config.yaml
+.python-version
+info.log
+
 
 # except the following
 !logs/.gitkeep

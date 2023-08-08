@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ### Manual Deployment
 
 - you can manually deploy the azure infrastructure with
-  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters infrastructure/default_parameters.bicepparam`
+  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters infrastructure/dev_resources/default_parameters.bicepparam`
 
 ### Deployment with github actions (if repo is on github)
 

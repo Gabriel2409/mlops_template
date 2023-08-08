@@ -22,7 +22,7 @@ stages:
               resourceGroupName: "$(AZURE_RG)"
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
-              csmFile: "$(Build.SourcesDirectory)/infrastructure/dev_resources.bicep"
+              csmFile: "$(Build.SourcesDirectory)/infrastructure/dev_resources/dev_resources.bicep"
               overrideParameters: "-baseName $(BASE_NAME) -location $(AZURE_LOCATION)"
               deploymentMode: "Incremental"
               deploymentName: "AzureDevResources"

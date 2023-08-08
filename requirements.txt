@@ -1,5 +1,5 @@
 azureml-core
-# azureml-mlflow
+azureml-mlflow~=1.52.0
 black
 dvc[azure]
 flake8
@@ -8,13 +8,13 @@ isort
 jupyter
 jupyterlab
 jupyterlab_server
-kedro
+kedro~=0.18.12
 # kedro-azureml[mlflow]
 # kedro-docker
 kedro-mlflow~=0.11.9
 kedro-viz
 matplotlib
-mlflow~=1.27.0
+mlflow~=2.5.0
 nbstripout
 numpy~=1.23.5
 numpyencoder

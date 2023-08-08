@@ -1,4 +1,4 @@
-name: CreateCpuAmlEnv
+name: CreateCpuDevCluster
 pr: none
 trigger: none
 
@@ -9,8 +9,8 @@ stages:
   - stage: "Dev"
     displayName: "Dev"
     jobs:
-      - job: "CreateCpuAmlEnv"
-        displayName: "Create the azure ml environment for cpu clusters"
+      - job: "CreateCpuDevCluster"
+        displayName: "Create the azure ml compute cluster for cpu workloads"
         pool:
           vmImage: "ubuntu-latest"
         timeoutInMinutes: 0
@@ -25,10 +25,10 @@ stages:
               inlineScript: "az extension add -n ml"
 
           - task: AzureCLI@2
-            displayName: "Create a new version of the environment"
+            displayName: "Create / Update the cluster"
             inputs:
               azureSubscription: "AzureMlopsRG-Devops-Connector"
               scriptType: bash
-              scriptPath: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments/create-mlopstplot-cpu-env.bash"
+              scriptPath: "$(System.DefaultWorkingDirectory)/infrastructure/aml_compute_clusters/create-dev-cluster.bash"
               arguments: "$(AZURE_RG) $(AZUREML_WORKSPACE)"
-              workingDirectory: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments"
+              workingDirectory: "$(System.DefaultWorkingDirectory)/infrastructure/aml_compute_clusters"

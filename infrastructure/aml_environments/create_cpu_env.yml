@@ -1,0 +1,34 @@
+name: CreateCpuAmlEnv
+pr: none
+trigger: none
+
+variables:
+  - group: mlops-vg
+
+stages:
+  - stage: "Dev"
+    displayName: "Dev"
+    jobs:
+      - job: "CreateCpuAmlEnv"
+        displayName: "Create the azure ml environment for cpu clusters"
+        pool:
+          vmImage: "ubuntu-latest"
+        timeoutInMinutes: 0
+
+        steps:
+          - task: AzureCLI@2
+            displayName: "install ml ext"
+            inputs:
+              azureSubscription: "AzureMlopsRG-Devops-Connector"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: "az extension add -n ml"
+
+          - task: AzureCLI@2
+            displayName: "Azure CLI $(System.DefaultWorkingDirectory)/infrastructure/aml_environments/create-mlopstplot-cpu-env.bash"
+            inputs:
+              azureSubscription: "AzureMlopsRG-Devops-Connector"
+              scriptType: bash
+              scriptPath: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments/create-mlopstplot-cpu-env.bash"
+              arguments: "$(AZURE_RG) $(AZUREML_WORKSPACE)"
+              workingDirectory: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments"

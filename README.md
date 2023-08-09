@@ -129,6 +129,7 @@ https://kedro-mlflow.readthedocs.io/en/stable/
   either by running `mlflow.get_tracking_uri()` from a notebook directly on the workspace or
   by running `az ml workspace show -n <workspacename>`.
 
+- Note that if you launch your script on an azure ml compute instance or compute cluster, you don't need to modify anything (which is why the mlflow.yml file is not committed to source control)
 
 ## Create a custom environment to use for your compute instances and clusters
 
@@ -192,7 +193,7 @@ env = Environment.from_docker_image(
 env.register(workspace=ws)
 ```
 
-or from the cli: 
+- or from the cli: 
 
 `az ml environment create --resource-group <rg> --workspace-name <ws> --image mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest --conda-file conda-dependencies.yaml --name <env_name>`
 
@@ -201,24 +202,88 @@ or from the cli:
 - TODO: Microsoft also has a list of prebuilt images for inference. It might be worth checking out
 
 
+## Create a compute cluster for jobs and ml pipelines
+- We can create a compute cluster directly from the azure ml studio
 
-## Combine kedro and azure pipelines to run the code on an AML compute cluster
+- Alternatively, we can use the python sdk
+```python
+from azureml.core.compute import ComputeTarget, AmlCompute
+from azureml.core.compute_target import ComputeTargetException
 
+cluster_name = "mycluster"
+try:
+    cluster = ComputeTarget(workspace=ws, name=cluster_name)
+    print("Found existing cluster, use it.")
+except ComputeTargetException:
+    compute_config = AmlCompute.provisioning_configuration(
+        vm_size="STANDARD_D2_V2", max_nodes=4, idle_seconds_before_scaledown=2400
+    )
+    cluster = ComputeTarget.create(ws, cluster_name, compute_config)
+cluster.wait_for_completion(show_output=True)
+```
+
+- We can also use the cli
+```yml
+# cluster_specs.yml
+$schema: https://azuremlschemas.azureedge.net/latest/amlCompute.schema.json 
+name: mycluster
+type: amlcompute
+size: STANDARD_DS3_v2
+min_instances: 0
+max_instances: 2
+idle_time_before_scale_down: 1800
+tier: dedicated
+```
+Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --file $script_dir/cluster_specs.yml`
+
+## Submit an azure ml job
+
+- You can submit jobs and pipelines to azure ml 
+
+- python sdk
+```python
+from azureml.core.script_run_config import ScriptRunConfig
+from azureml.core import Experiment
+
+exp = Experiment(ws, 'myexp')
+
+config = ScriptRunConfig(
+    source_directory='./path/to/dir/',
+    script='myscript.py',
+    compute_target=cluster,
+    environment=env,
+)
+
+run = exp.submit(config)
+run.wait_for_completion(show_output=True)
+```
+
+
+- cli version, example with kedro
+```yml
+#example_job.yml
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+description: "Run Kedro"
+# experiment_name: "myexp" # experiment is already set with kedro, including an experiment_name will lead to an error
+compute: azureml:cpu-dev-cluster # name of the compute cluster
+command: |
+  kedro run 
+environment: azureml:mlopstplt-cpu-env@latest #name of the custom environment
+code: . # directory to include (files in .gitignore and .amlignore are not included)
+```
+Run your job with: `az ml job create --file example_job.yaml -w <workspace> -g <rg>` 
+
+Note: Code used is stored on a container in the blob storage associated to a workspace.
+
+
+## Combine kedro and azure pipelines to run the code as a pipeline instead of a job 
+
+- The problem with the current setup is that the full kedro pipeline is run as a single 
+job on a given cluster. The kedro-azureml plugin allows to run the code as an azure ml 
+pipeline where each node in the pipeline corresponds to a different step. Moreover, 
+each node can be run on a different cluster. More infor here:
 https://kedro-azureml.readthedocs.io/en/0.4.1/source/03_quickstart.html#
-
-- While you can run code directly in the azure ml workspace, you can also develop locally and use the kedro-azureml plugin to run the kedro pipeline on an aml compute cluster. This has the advantage of creating an azure ml pipeline that you can then investigate directly.
-
-### Create a kedro-image to use as a training env for the aml workspace
-
-- Run `kedro docker init`: this will automatically create a Dockerfile, a .dockerignore
-  and a .dive-ci file to help with kedro deployment.
-
-- This plugin can helop you run kedro in a docker environment but it was modified to 
-create a dev  version of the dockerfile. The dev version is used with docker compose up
-then you can docker exec into the container. 
-
-
-
 
 
 ### Use kedro-azureml to launch the training on the workspace

@@ -42,17 +42,19 @@ def create_pipeline(**kwargs) -> Pipeline:
                     func=get_features_and_target,
                     inputs={"df": "encoded_train_df"},
                     outputs=["X_train", "y_train"],
+                    name="get_features_and_target_train",
                 ),
                 node(
                     func=get_features_and_target,
                     inputs={"df": "encoded_test_df"},
                     outputs=["X_test", "y_test"],
+                    name="get_features_and_target_test"
                 ),
                 node(
                     func=fit_dummy_classifier,
                     inputs=["X_train", "y_train", "params:strategy"],
                     outputs="mlflow_sklearn_classifier",
-                    name="dummy_classifier",
+                    name="fit_dummy_classifier_on_train",
                 ),
             ]
         )

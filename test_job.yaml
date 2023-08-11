@@ -1,0 +1,9 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+description: "kedro test"
+# experiment_name: "kedrothistime" # env is set with kedro
+compute: azureml:cpu-dev-cluster
+command: |
+  kedro run 
+environment: azureml:mlopstplt-cpu-env@latest
+code: .

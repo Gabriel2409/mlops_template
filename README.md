@@ -282,14 +282,13 @@ Note: Code used is stored on a container in the blob storage associated to a wor
 - The problem with the current setup is that the full kedro pipeline is run as a single 
 job on a given cluster. The kedro-azureml plugin allows to run the code as an azure ml 
 pipeline where each node in the pipeline corresponds to a different step. Moreover, 
-each node can be run on a different cluster. More infor here:
+each node can be run on a different cluster. More info here:
 https://kedro-azureml.readthedocs.io/en/0.4.1/source/03_quickstart.html#
 
+- Below is an example on how to use the plugin
 
-### Use kedro-azureml to launch the training on the workspace
-
-- run `kedro azureml init <AZURE_SUBSCRIPTION_ID> <AZURE_RESOURCE_GROUP> <AML_WORKSPACE_NAME> <EXPERIMENT_NAME> <COMPUTE_NAME> -aml-env <amlenv:version>  -a <STORAGE_ACCOUNT_NAME> -c <STORAGE_CONTAINER_NAME>`
+- run `kedro azureml init <AZURE_SUBSCRIPTION_ID> <AZURE_RESOURCE_GROUP> <AML_WORKSPACE_NAME> <EXPERIMENT_NAME> <COMPUTE_NAME> --aml-env <amlenv:version>  -a <STORAGE_ACCOUNT_NAME> -c <STORAGE_CONTAINER_NAME>`
 
 Note that the COMPUTE_NAME must be a cluster instance not a compute instance. Be careful because this works by sending all the data to storage before running the pipeline so we must be careful with the cost management
 
-- This creates
+- This plugin is not officially maintained by kedro team so I will keep it simple for now and not use it

@@ -2,8 +2,8 @@
 # KEDRO PROJECT
 
 # ignore all local configuration
-conf/local/**
-!conf/local/.gitkeep
+conf/local/**.yml
+conf/local/**.yaml
 .telemetry
 
 # ignore potentially sensitive credentials files

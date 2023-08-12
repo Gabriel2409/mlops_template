@@ -1,5 +1,4 @@
 # aditional dependendies for creating an environment for cpu workloads
-name: mlopstplt-cpu-env
 dependencies:
   - python==3.10.11
   - pip=23.2.1

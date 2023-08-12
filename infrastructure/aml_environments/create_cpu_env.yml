@@ -30,5 +30,5 @@ stages:
               azureSubscription: "AzureMlopsRG-Devops-Connector"
               scriptType: bash
               scriptPath: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments/create-mlopstplot-cpu-env.bash"
-              arguments: "$(AZURE_RG) $(AZUREML_WORKSPACE)"
+              arguments: "$(AZURE_RG) $(AZUREML_WORKSPACE) $(AML_CPU_ENV)"
               workingDirectory: "$(System.DefaultWorkingDirectory)/infrastructure/aml_environments"

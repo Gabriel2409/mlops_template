@@ -7,8 +7,8 @@ Combines title and description field into one unique text field
 
 ## Pipeline inputs
 
-projects_raw
+`projects_raw`: the input csv
 
 ## Pipeline outputs
 
-projects_text
+`projects_text`: the output csv

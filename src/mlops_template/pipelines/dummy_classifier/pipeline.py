@@ -6,11 +6,7 @@ generated using Kedro 0.18.11
 from kedro.pipeline import Pipeline, node
 from kedro.pipeline.modular_pipeline import pipeline
 
-from mlops_template.pipelines import (
-    encode_tag,
-    log_dvc_ref_to_datasets,
-    log_sklearn_metrics,
-)
+from mlops_template.pipelines import combine_text, encode_tag, log_sklearn_metrics
 
 from .nodes import fit_dummy_classifier, get_features_and_target
 
@@ -18,10 +14,14 @@ from .nodes import fit_dummy_classifier, get_features_and_target
 def create_pipeline(**kwargs) -> Pipeline:
     return (
         pipeline(
-            pipe=log_dvc_ref_to_datasets.create_pipeline(),
+            pipe=combine_text.create_pipeline(),
             inputs={
-                "train_dvc_file": "projects_train_text_dvc",
-                "test_dvc_file": "projects_test_text_dvc",
+                "projects_train_raw": "projects_train_raw",
+                "projects_test_raw": "projects_test_raw",
+            },
+            outputs={
+                "projects_train_text": "projects_train_text",
+                "projects_test_text": "projects_test_text",
             },
         )
         + pipeline(
@@ -33,7 +33,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             outputs={
                 "encoded_train_df": "encoded_train_df",
                 "encoded_test_df": "encoded_test_df",
-                "label_encoder_mapping": "label_encoder_mapping",
+                "label_encoder_mapping": "label_encoder_mapping_mlflow",
             },
         )
         + Pipeline(
@@ -48,7 +48,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                     func=get_features_and_target,
                     inputs={"df": "encoded_test_df"},
                     outputs=["X_test", "y_test"],
-                    name="get_features_and_target_test"
+                    name="get_features_and_target_test",
                 ),
                 node(
                     func=fit_dummy_classifier,
@@ -66,7 +66,15 @@ def create_pipeline(**kwargs) -> Pipeline:
                 "y_train": "y_train",
                 "X_test": "X_test",
                 "y_test": "y_test",
-            }
-            # inputs={"y_true": "y_true", "y_pred": "y_pred"},
+            },
+            outputs={
+                "sklearn_classifier_mlflow": "sklearn_classifier_mlflow",
+                "train_metrics_mlflow": "train_metrics_mlflow",
+                "train_classification_report_mlflow": "train_classification_report_mlflow",
+                "train_confusion_matrix_mlflow": "train_confusion_matrix_mlflow",
+                "test_metrics_mlflow": "test_metrics_mlflow",
+                "test_classification_report_mlflow": "test_classification_report_mlflow",
+                "test_confusion_matrix_mlflow": "test_confusion_matrix_mlflow",
+            },
         )
     )

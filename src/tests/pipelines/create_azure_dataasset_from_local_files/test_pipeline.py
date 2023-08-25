@@ -1,6 +1,6 @@
 """
-This is a boilerplate test file for pipeline 'log_dvc_ref_to_datasets'
-generated using Kedro 0.18.11.
+This is a boilerplate test file for pipeline 'create_azure_dataasset_from_local_files'
+generated using Kedro 0.18.12.
 Please add your pipeline tests here.
 
 Kedro recommends using `pytest` framework, more info about it can be found

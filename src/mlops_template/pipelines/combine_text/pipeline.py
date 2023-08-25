@@ -10,7 +10,7 @@ from .nodes import combine_title_and_desc
 
 def create_pipeline(**kwargs) -> Pipeline:
     """Kedro pipeline for combining 'title' and 'description' fields into 'text' field.
-    for both the train and test set and saves the resulting datasets
+    for both the train and test set
     """
     return Pipeline(
         nodes=[

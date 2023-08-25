@@ -3,89 +3,98 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
 
-
 # --- initial files - already divided in train an test ---
-projects_train_raw:
-  type: pandas.CSVDataSet
-  filepath: data/01_raw/dataset.csv
+# projects_train_raw_local:
+#   type: pandas.CSVDataSet
+#   filepath: data/01_raw/dataset.csv
 
-projects_test_raw:
+projects_test_raw_local:
   type: pandas.CSVDataSet
   filepath: data/01_raw/holdout.csv
 
-# files after combining title and description
-projects_train_text:
-  type: pandas.CSVDataSet
-  filepath: data/02_intermediate/projects_train_text.csv
+# projects_train_raw:
+#     type: kedro_azureml.datasets.AzureMLAssetDataSet
+#     azureml_dataset: train3
+#     root_dir: data/00_azurelocals/ # for local runs only
+#     versioned: True
+#     azureml_type: uri_file
+#     dataset:
+#         type: pandas.CSVDataSet
+#         filepath: "dataset.csv"
 
-projects_train_text_dvc:
-  type: text.TextDataSet
-  filepath: data/02_intermediate/projects_train_text.csv.dvc
+projects_test_raw:
+  type: kedro_azureml.datasets.AzureMLAssetDataSet
+  azureml_dataset: test3
+  root_dir: data/00_azurelocals/ # for local runs only
+  versioned: True
+  azureml_type: uri_file
+  dataset:
+    type: pandas.CSVDataSet
+    filepath: "holdout.csv"
 
-dvc_train_dataset_artifact: #artifact for mlflow
-  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
-  data_set:
-    type: text.TextDataSet
-    filepath: dvc_training_set.txt
+projects_train_raw_local:
+  type: PartitionedDataset
+  path: data/partitioned_ds
+  dataset:
+    type: pandas.CSVDataSet
 
+projects_train_raw:
+  type: kedro_azureml.datasets.AzureMLAssetDataSet
+  azureml_dataset: test4
+  root_dir: data/00_azurelocals/ # for local runs only
+  versioned: True
+  azureml_type: uri_folder
+  dataset:
+    type: pandas.CSVDataSet
+    filepath: "."
 
-projects_test_text:
-  type: pandas.CSVDataSet
-  filepath: data/02_intermediate/projects_test_text.csv
+# mlflow artifacts: can not be passed between nodes with kedro-azureml if using a
+# local path
+# However, I don't like the idea of using a path on the storage because if two pipelines
+# run concurrently, there might be some issues.
+# -> workaround, only use them as outputs and not inputs
 
-projects_test_text_dvc:
-  type: text.TextDataSet
-  filepath: data/02_intermediate/projects_test_text.csv.dvc
-
-dvc_test_dataset_artifact: #artifact for mlflow
-  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
-  data_set:
-    type: text.TextDataSet
-    filepath: dvc_testing_set.txt
-
-label_encoder_mapping:
+label_encoder_mapping_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: json.JSONDataSet
     filepath: label_encoder_mapping.json
 
-
-mlflow_sklearn_classifier:
+sklearn_classifier_mlflow:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
   flavor: mlflow.sklearn
 
-optuna_best_params:
+optuna_best_params_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: json.JSONDataSet
     filepath: best_params.json
 
-train_mlflow_metrics:
+train_metrics_mlflow:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 
-train_mlflow_classification_report:
+train_classification_report_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: pandas.CSVDataSet
     filepath: train_classification_report.csv
 
-train_mlflow_confusion_matrix:
+train_confusion_matrix_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: text.TextDataSet
     filepath: train_confusion_matrix.txt
 
-
-test_mlflow_metrics:
+test_metrics_mlflow:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 
-test_mlflow_classification_report:
+test_classification_report_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: pandas.CSVDataSet
     filepath: test_classification_report.csv
 
-test_mlflow_confusion_matrix:
+test_confusion_matrix_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: text.TextDataSet

@@ -15,7 +15,7 @@ def format_classification_report(cr: dict):
 
 
 def log_sklearn_scores(model, X_train, y_train, X_test, y_test):
-    """returns all important metrics for logging"""
+    """returns model and all important metrics for logging"""
 
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
@@ -46,6 +46,7 @@ def log_sklearn_scores(model, X_train, y_train, X_test, y_test):
     log.info(f'Test Macro F1 Score: {report_test["macro avg"]["f1-score"]}')
     log.info(f'Test Weighted F1 Score: {report_test["weighted avg"]["f1-score"]}')
     return (
+        model,
         train_metrics,
         format_classification_report(report_train),
         np.array2string(cm_train),

@@ -1,0 +1,33 @@
+name: LaunchTrainingPipeline
+pr: none
+trigger: none
+
+variables:
+  - group: mlops-vg
+
+stages:
+  - stage: "Dev"
+    displayName: "Dev"
+    jobs:
+      - job: "LaunchTrainingPipeline"
+        displayName: "Lauches kedro azureml to train the model"
+        pool:
+          vmImage: "ubuntu-latest"
+        timeoutInMinutes: 0
+
+        steps:
+          - task: AzureCLI@2
+            displayName: "install ml ext"
+            inputs:
+              azureSubscription: "AzureMlopsRG-Devops-Connector"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: "az extension add -n ml"
+
+          - task: AzureCLI@2
+            displayName: "Launch the training - config in azureml file"
+            inputs:
+              azureSubscription: "AzureMlopsRG-Devops-Connector"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: "kedro azureml run -p dummy_classifier"

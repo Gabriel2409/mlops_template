@@ -3,6 +3,12 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
 
+# --- reusable configs -------------------------------------
+_aml_urifolder_dataasset: &aml_urifolder_dataasset
+  type: kedro_azureml.datasets.AzureMLAssetDataSet
+  versioned: True
+  azureml_type: uri_folder
+
 # --- initial files - already divided in train an test ---
 projects_train_dataset#web:
   type: pandas.CSVDataSet
@@ -14,26 +20,30 @@ projects_test_dataset#web:
   # filepath: data/01_raw/holdout.csv
   filepath: https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/holdout.csv
 
+# -- not working for some reason
+# "projects_{split_type}_dataset#urifolder":
+#     <<: *aml_urifolder_dataasset
+#     azureml_dataset: projects_{split_type}_dataset
+#     root_dir: data/00_azurelocals/ # for local runs only
+#     dataset:
+#         type: pandas.CSVDataSet
+#         filepath: "projects_{split_type}_dataset.csv"
+
 projects_train_dataset#urifolder:
-    type: kedro_azureml.datasets.AzureMLAssetDataSet
-    azureml_dataset: projects_train_dataset
-    root_dir: data/00_azurelocals/ # for local runs only
-    versioned: True
-    azureml_type: uri_folder
-    dataset:
-        type: pandas.CSVDataSet
-        filepath: "projects_train_dataset.csv"
+  <<: *aml_urifolder_dataasset
+  azureml_dataset: projects_train_dataset
+  root_dir: data/00_azurelocals/ # for local runs only
+  dataset:
+    type: pandas.CSVDataSet
+    filepath: "projects_train_dataset.csv"
 
 projects_test_dataset#urifolder:
-  type: kedro_azureml.datasets.AzureMLAssetDataSet
+  <<: *aml_urifolder_dataasset
   azureml_dataset: projects_test_dataset
   root_dir: data/00_azurelocals/ # for local runs only
-  versioned: True
-  azureml_type: uri_folder
   dataset:
     type: pandas.CSVDataSet
     filepath: "projects_test_dataset.csv"
-
 
 # mlflow artifacts: can not be passed between nodes with kedro-azureml if using a
 # local path

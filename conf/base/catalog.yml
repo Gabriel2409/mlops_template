@@ -4,33 +4,35 @@
 # Link: https://docs.kedro.org/en/stable/data/data_catalog.html
 
 # --- initial files - already divided in train an test ---
-projects_train_raw:
+projects_train_dataset#web:
   type: pandas.CSVDataSet
-  filepath: data/01_raw/dataset.csv
+  # filepath: data/01_raw/dataset.csv
+  filepath: https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv
 
-projects_test_raw:
+projects_test_dataset#web:
   type: pandas.CSVDataSet
-  filepath: data/01_raw/holdout.csv
+  # filepath: data/01_raw/holdout.csv
+  filepath: https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/holdout.csv
 
-# projects_train_raw:
-#     type: kedro_azureml.datasets.AzureMLAssetDataSet
-#     azureml_dataset: train_14
-#     root_dir: data/00_azurelocals/ # for local runs only
-#     versioned: True
-#     azureml_type: uri_file
-#     dataset:
-#         type: pandas.CSVDataSet
-#         filepath: "dataset.csv"
+projects_train_dataset#urifolder:
+    type: kedro_azureml.datasets.AzureMLAssetDataSet
+    azureml_dataset: projects_train_dataset
+    root_dir: data/00_azurelocals/ # for local runs only
+    versioned: True
+    azureml_type: uri_folder
+    dataset:
+        type: pandas.CSVDataSet
+        filepath: "projects_train_dataset.csv"
 
-# projects_test_raw:
-#   type: kedro_azureml.datasets.AzureMLAssetDataSet
-#   azureml_dataset: test_1
-#   root_dir: data/00_azurelocals/ # for local runs only
-#   versioned: True
-#   azureml_type: uri_file
-#   dataset:
-#     type: pandas.CSVDataSet
-#     filepath: "holdout.csv"
+projects_test_dataset#urifolder:
+  type: kedro_azureml.datasets.AzureMLAssetDataSet
+  azureml_dataset: projects_test_dataset
+  root_dir: data/00_azurelocals/ # for local runs only
+  versioned: True
+  azureml_type: uri_folder
+  dataset:
+    type: pandas.CSVDataSet
+    filepath: "projects_test_dataset.csv"
 
 
 # mlflow artifacts: can not be passed between nodes with kedro-azureml if using a

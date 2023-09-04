@@ -5,5 +5,5 @@ description: "kedro test"
 compute: azureml:cpu-dev-cluster
 command: |
   kedro run
-environment: azureml:mlopstplt-cpu-env@latest
+environment: azureml:mlopstpl-cpu-env@latest
 code: .

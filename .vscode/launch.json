@@ -19,6 +19,7 @@
             "request": "launch",
             "console": "integratedTerminal",
             "module": "kedro",
+            "justMyCode": true,
             "args": [
                 "run"
             ]
@@ -33,7 +34,8 @@
             "justMyCode": false,
             "args": [
                 "azureml",
-                "run"
+                "run",
+                "--wait-for-completion"
             ]
         }
     ]

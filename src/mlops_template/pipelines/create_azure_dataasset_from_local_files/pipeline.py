@@ -11,8 +11,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         nodes=[
             node(
                 func=lambda x: x,
-                inputs="projects_train_raw_local",
-                outputs="projects_train_raw",
+                inputs="projects_train_dataset#web",
+                outputs="projects_train_dataset#urifolder",
                 name="create_train_dataasset",
             ),
             # node(

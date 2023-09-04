@@ -16,8 +16,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         pipeline(
             pipe=combine_text.create_pipeline(),
             inputs={
-                "projects_train_raw": "projects_train_raw",
-                "projects_test_raw": "projects_test_raw",
+                "projects_train_raw": "projects_train_dataset#urifolder",
+                "projects_test_raw": "projects_test_dataset#urifolder",
             },
             outputs={
                 "projects_train_text": "projects_train_text",
@@ -42,11 +42,13 @@ def create_pipeline(**kwargs) -> Pipeline:
                     func=get_features_and_target,
                     inputs={"df": "encoded_train_df"},
                     outputs=["X_train", "y_train"],
+                    name="get_features_and_target_train",
                 ),
                 node(
                     func=get_features_and_target,
                     inputs={"df": "encoded_test_df"},
                     outputs=["X_test", "y_test"],
+                    name="get_features_and_target_test",
                 ),
                 node(
                     # func=fit_tfidf_vectorizer_and_sgdclassifier,
@@ -57,7 +59,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                         "n_trials": "params:tfidf_sgd_n_trials_optuna",
                     },
                     outputs=["mlflow_sklearn_classifier", "optuna_best_params"],
-                    name="tfidf_sgdclassifier",
+                    name="fit_tfidf_sgdclassifier_on_train",
                 ),
             ]
         )

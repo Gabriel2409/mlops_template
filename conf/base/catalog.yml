@@ -55,7 +55,7 @@ label_encoder_mapping_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: json.JSONDataSet
-    filepath: label_encoder_mapping.json
+    filepath: mlflow_artifacts/label_encoder_mapping.json
 
 sklearn_classifier_mlflow:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
@@ -65,7 +65,7 @@ optuna_best_params_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: json.JSONDataSet
-    filepath: best_params.json
+    filepath: mlflow_artifacts/best_params.json
 
 train_metrics_mlflow:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
@@ -74,13 +74,14 @@ train_classification_report_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: pandas.CSVDataSet
-    filepath: train_classification_report.csv
+    filepath: mlflow_artifacts/train_classification_report.csv
 
 train_confusion_matrix_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: text.TextDataSet
-    filepath: train_confusion_matrix.txt
+    filepath: mlflow_artifacts/train_confusion_matrix.txt
+
 
 test_metrics_mlflow:
   type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
@@ -89,10 +90,10 @@ test_classification_report_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: pandas.CSVDataSet
-    filepath: test_classification_report.csv
+    filepath: mlflow_artifacts/test_classification_report.csv
 
 test_confusion_matrix_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:
     type: text.TextDataSet
-    filepath: test_confusion_matrix.txt
+    filepath: mlflow_artifacts/test_confusion_matrix.txt

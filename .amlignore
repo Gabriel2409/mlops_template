@@ -4,6 +4,7 @@
 .vscode
 venv/
 mlruns/
+mlflow_artifacts/
 .dvc/
 docs/
 infrastructure/

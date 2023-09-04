@@ -16,8 +16,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         pipeline(
             pipe=combine_text.create_pipeline(),
             inputs={
-                "projects_train_raw": "projects_train#web",
-                "projects_test_raw": "projects_test#web",
+                "projects_train_raw": "projects_train_dataset#urifolder",
+                "projects_test_raw": "projects_test_dataset#urifolder",
             },
             outputs={
                 "projects_train_text": "projects_train_text",

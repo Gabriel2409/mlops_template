@@ -15,11 +15,11 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs="projects_train_raw",
                 name="create_train_dataasset",
             ),
-            node(
-                func=lambda x: x,
-                inputs="projects_test_raw_local",
-                outputs="projects_test_raw",
-                name="create_test_dataasset",
-            ),
+            # node(
+            #     func=lambda x: x,
+            #     inputs="projects_test_raw_local",
+            #     outputs="projects_test_raw",
+            #     name="create_test_dataasset",
+            # ),
         ]
     )

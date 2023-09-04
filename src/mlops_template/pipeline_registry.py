@@ -19,5 +19,5 @@ def register_pipelines() -> dict[str, Pipeline]:
     """
     pipelines = find_pipelines()
     # pipelines["__default__"] = sum(pipelines.values())
-    pipelines["__default__"] = create_azure_dataasset_from_local_files.create_pipeline()
+    pipelines["__default__"] = dummy_classifier.create_pipeline()
     return pipelines

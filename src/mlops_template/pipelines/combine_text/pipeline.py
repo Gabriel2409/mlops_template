@@ -16,14 +16,14 @@ def create_pipeline(**kwargs) -> Pipeline:
         nodes=[
             node(
                 func=combine_title_and_desc,
-                inputs="projects_train_raw",
-                outputs="projects_train_text",
+                inputs="projects_train",
+                outputs="projects_train_combined_text",
                 name="combine_title_and_desc_train",
             ),
             node(
                 func=combine_title_and_desc,
-                inputs="projects_test_raw",
-                outputs="projects_test_text",
+                inputs="projects_test",
+                outputs="projects_test_combined_text",
                 name="combine_title_and_desc_test",
             ),
         ]

@@ -16,19 +16,19 @@ def create_pipeline(**kwargs) -> Pipeline:
         pipeline(
             pipe=combine_text.create_pipeline(),
             inputs={
-                "projects_train_raw": "projects_train_dataset#urifolder",
-                "projects_test_raw": "projects_test_dataset#urifolder",
+                "projects_train": "projects_train_dataset#web",
+                "projects_test": "projects_test_dataset#web",
             },
             outputs={
-                "projects_train_text": "projects_train_text",
-                "projects_test_text": "projects_test_text",
+                "projects_train_combined_text": "projects_train_combined_text",
+                "projects_test_combined_text": "projects_test_combined_text",
             },
         )
         + pipeline(
             pipe=encode_tag.create_pipeline(),
             inputs={
-                "train_df_to_encode": "projects_train_text",
-                "test_df_to_encode": "projects_test_text",
+                "train_df_to_encode": "projects_train_combined_text",
+                "test_df_to_encode": "projects_test_combined_text",
             },
             outputs={
                 "encoded_train_df": "encoded_train_df",
@@ -58,7 +58,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                         "y_train": "y_train",
                         "n_trials": "params:tfidf_sgd_n_trials_optuna",
                     },
-                    outputs=["mlflow_sklearn_classifier", "optuna_best_params"],
+                    outputs=["sklearn_classifier", "optuna_best_params"],
                     name="fit_tfidf_sgdclassifier_on_train",
                 ),
             ]
@@ -66,7 +66,7 @@ def create_pipeline(**kwargs) -> Pipeline:
         + pipeline(
             pipe=log_sklearn_metrics.create_pipeline(),
             inputs={
-                "model": "mlflow_sklearn_classifier",
+                "model": "sklearn_classifier",
                 "X_train": "X_train",
                 "y_train": "y_train",
                 "X_test": "X_test",

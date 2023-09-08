@@ -38,4 +38,12 @@ stages:
               azureSubscription: "AzureMlopsRG-Devops-Connector"
               scriptType: bash
               scriptLocation: inlineScript
-              inlineScript: "kedro azureml run -p dummy_classifier"
+              inlineScript: "kedro azureml run -p $(TRAINING_KEDRO_PIPELINE) --wait-for-completion"
+          - task: AzureCLI@2
+            displayName: "Register the model"
+            inputs:
+              azureSubscription: "AzureMlopsRG-Devops-Connector"
+              scriptType: bash
+              scriptPath: "$(System.DefaultWorkingDirectory)/cicd/training_pipeline/register_trained_model.bash"
+              arguments: "$(AZURE_RG) $(AZUREML_WORKSPACE) $(TRAINING_KEDRO_PIPELINE)"
+              workingDirectory: "$(System.DefaultWorkingDirectory)/cicd/training_pipeline"

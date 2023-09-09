@@ -1,4 +1,4 @@
-name: LaunchTrainingPipeline
+name: TrainAndRegisterModel
 pr: none
 trigger: none
 
@@ -9,12 +9,11 @@ stages:
   - stage: "Dev"
     displayName: "Dev"
     jobs:
-      - job: "LaunchTrainingPipeline"
+      - job: "TrainAndRegisterModel"
         displayName: "Lauches kedro azureml to train the model"
         pool:
           vmImage: "ubuntu-latest"
         timeoutInMinutes: 0
-
         steps:
           - task: UsePythonVersion@0
             inputs:

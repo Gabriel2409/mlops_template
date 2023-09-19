@@ -13,22 +13,21 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Provision dev resources on azure
+## Provision resources on azure
 
-- To use azure ml studio, you need the infrastructure, a compute cluster to run the pipelines
-and a ml environment (which is different from the devops environement).
-- Here, the compute cluster is included in the devops environement but not the ml environment
-as the ml environment is the longest to build + it changes a lot and should not be tied to
-a given infrastructure. This is why you will find an arm template for the cluster but not the
-ml environment
+- To use azure ml studio, you need the infrastructure, a compute cluster to run the pipelines and a ml environment (which is different from the devops environement).
+
+### Infrastructure
 
 
-### Manual Deployment
+#### Manual Deployment
 
 - you can manually deploy the azure infrastructure with
-  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters <myfile.bicepparm>`
+  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters myfile.bicepparm`
 
-### Deployment with github actions (if repo is on github)
+`<myfile.bicepparam>` must include all the required parameters
+
+#### Deployment with github actions (if repo is on github)
 
 https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-github-actions?tabs=userlevel
 
@@ -47,145 +46,100 @@ az ad sp create-for-rbac \
 - also create other secrets: `AZURE_SUBSCRIPTION` and `AZURE_RG` and `AZURE_LOCATION`
 - add the repository variable `BASE_NAME`
 
-### Deployment with azure devops (if repo is on azure devops)
-
-
-#### Notes:
-
-in `infrastructure` folder, you can deploy either using `aml_compute_clusters`, `aml_environements`
-and `dev_resources` folders.
-However, I changed the way to deploy and you can instead use the `pipelines` subfolders
-which calls `modules` and `templates` folders. This is probably better as it uses arm templates
-for everything
-
+#### Deployment with azure devops (if repo is on azure devops)
 
 - no need to create a SP manually, instead go to project settings > service connections
   then choose Azure Resource manager and configure the SP here
 - Note: if you go to `App registrations` in azure portal, you should see the service principal
 
-#### v1
+##### v1
 
 - Create a new variable group named mlopsvars (Pipelines / Library) and you can easily add variables.
 - Add `AZURE_RG`, `AZURE_LOCATION`, `BASE_NAME` and `AZURE_RM_SVC_CONNECTION` (the name of the connector that was just created)
 - Optionally click on the lock to make the variables secrets
 - create a pipeline using `deploy_dev_resources_azdvops.yml`
 
-#### v2
+##### v2
 
 Since then I improved the deployment. Use `infrastructure/pipelines/deploy-infra.yml` instead, no need to add variables
 in azure devops. Instead, modify the `config-infra-prod.yml` file
 
-NOTE: Further down in the readme, there are methods to deploy environements and clusters without using arm templates.
-However, you can create a pipeline with `deploy-aml-cpu-computecluster.yml` and `deploy-cpu-env.yml` if you want to use
-arm templates instead.
+Note that this also deploys the compute cluster.
 
-### QoL
+#### QoL post deployment
 
 - configure defaults: `az configure --defaults group=<myrg> workspace=<myworkspace> location=<location>`
 
-## Track files with dvc (skip if using azureml data asset)
 
-- Run `dvc init`
-- Run the get_data.ipynb notebook to download the train and test file and put them
-  in data/01_raw
+### Compute cluster
 
-### Local tracking
+- We can create a compute cluster directly from the azure ml studio
 
-- in `.dvc/config`, track everything locally:
+- Alternatively, we can use the python sdk
 
-```
-['remote "localdvc"']
-    url = ../localdvc
-[core]
-    autostage = true
-    remote = localdvc
-```
+```python
+from azureml.core.compute import ComputeTarget, AmlCompute
+from azureml.core.compute_target import ComputeTargetException
 
-- Note: `autostage = true` will allow you to automatically stage a file when it is added
-  with dvc
-- Note2: the config file is saved to source control as it does not contain any sensitive info
-
-### Remote tracking
-
-- if you have a storage on azure instead, create a config.local file by running
-
-```bash
-dvc remote add blob azure://mycontainer/myfolder  --local
+cluster_name = "mycluster"
+try:
+    cluster = ComputeTarget(workspace=ws, name=cluster_name)
+    print("Found existing cluster, use it.")
+except ComputeTargetException:
+    compute_config = AmlCompute.provisioning_configuration(
+        vm_size="STANDARD_D2_V2", max_nodes=4, idle_seconds_before_scaledown=2400
+    )
+    cluster = ComputeTarget.create(ws, cluster_name, compute_config)
+cluster.wait_for_completion(show_output=True)
 ```
 
-then in the .dvc/.config.local file:
+- We can also use the cli
 
-```bash
-['remote "blob"']
-    url = azure://mycontainer/myfolder
-    connection_string = <my_connection_string>
-[core]
-    remote = blob
+```yml
+# cluster_specs.yml
+$schema: https://azuremlschemas.azureedge.net/latest/amlCompute.schema.json
+name: mycluster
+type: amlcompute
+size: STANDARD_DS3_v2
+min_instances: 0
+max_instances: 2
+idle_time_before_scale_down: 1800
+tier: dedicated
 ```
 
-Note that you can get the connection string: `az storage account show-connection-string --name <storageaccountname> --key key1`
+Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --file $script_dir/cluster_specs.yml`
 
-config.local is not committed to source control and is used in priority over config
+- To automate this, you can also create a pipeline from `infrastructure/aml_compute_clusters/create_dev_compute_cluster.yml`
 
-If you don't want to use a connection string, create a service principal (https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign it the role Storage Blob Data Contributor in the IAM of the storage account, then in the config
+- NOTE: for v2, compute cluster is automatically created when deploying the infra
 
-```bash
-['remote "blob"']
-    url = azure://mycontainer/myfolder
-    account_name = storageaccountname
-    tenant_id = <tenant-id>
-    client_id = <client-id>
-    client_secret = <client-secret> # must be created for the SP
-[core]
-    remote = blob
-```
 
-## Create your project with kedro
+### ML Environment
 
-https://docs.kedro.org/en/stable/get_started/install.html
+NOTE: the concept of environment in azure devops is not the same as the one in
+azure ml. In v2 version of the deployment, infra is tied to a devops environment
+called prod. ml environments on the other hand, correspond to the image used for
+the training (usually a python image with conda dependencies but any docker image
+works). Because a given infra can have multiple environments, I did not add an arm
+template for the environment.
 
-- to create a new kedro project, run `kedro new`. The created folder is the working
-  directory for this repo. Note that i moved the requirments.txt outside of the src folder
-- Create pipeline with `kedro create pipeline <my_pipeline>`
-- Run a pipeline locally with `kedro run -p <my_pipeline>`
-
-## Add mlflow to kedro
-
-https://kedro-mlflow.readthedocs.io/en/stable/
-
-- To use the kedro-mlflow plugin, run `kedro mlflow init`. This will create a
-  mlflow.yml file.
-- By default experiments are tracked locally.
-
-- If you are using azure ml, you can change it to point to the aml workspace: you can obtain it either by running `mlflow.get_tracking_uri()` from a notebook directly on the workspace or by running `az ml workspace show -n <workspacename>`. Note that when using the ui with `kedro mlflow ui`, you MUST also set the `MLFLOW_TRACKING_URI` env var to point to the same value. For some reason, artifacts are not loaded correctly if this var is not set
-
-- Note that if you launch your script on an azure ml compute instance or compute cluster, you don't need to modify anything (which is why the mlflow.yml file is not committed to source control)
-
-## Create a custom environment to use for your compute instances and clusters
 
 - By default, azure comes with a lot of pre-configured environments that can be used as is.
-- It is also possible to create an environment from another by adding conda dependencies.
+- It is also possible to create an environment from an image by adding conda dependencies.
 - Finally, you can create your own environment from a dockerfile and push it to your
   container registry.
 - very nice resource: https://bea.stollnitz.com/blog/aml-environment/
 
-### kedro-docker (skip if using environment)
+#### Create from a container
 
-- plugin to help create kedro docker images
-- we are only interested in creating the environment so the process is even easier here
-- Run `kedro docker init`: this will automatically create a Dockerfile, a .dockerignore
-  and a .dive-ci file to help with kedro deployment.
-- In the docker file, remove everything except the requirements part
-- Run `kedro docker build --image=<acrname>.azurecr.io/<your_image_name>:latest`
-
+- if you have a docker image
 - login to the azure container registry: `az acr login --name <acrname>`
 - push the image: `docker push <acrname>.azurecr.io/<your_image_name>:latest`
-
-- Finally, create the azure ml environment:
+- create the azure ml environment:
   `az ml environment create --name <environment-name> --image <acrname>.azurecr.io/<your_image_name>:latest`
   You will be able to see the environment on azure ml
 
-### From an existing image / environment
+#### From an existing image / environment
 
 - It is also possible to go to the azure ml studio, start from a list of curated
   environment and customize them.
@@ -232,49 +186,45 @@ env.register(workspace=ws)
 
 - TODO: Microsoft also has a list of prebuilt images for inference. It might be worth checking out
 
-## Create a compute cluster for jobs and ml pipelines
 
-- We can create a compute cluster directly from the azure ml studio
+## Create your project with kedro
 
-- Alternatively, we can use the python sdk
+https://docs.kedro.org/en/stable/get_started/install.html
 
-```python
-from azureml.core.compute import ComputeTarget, AmlCompute
-from azureml.core.compute_target import ComputeTargetException
-
-cluster_name = "mycluster"
-try:
-    cluster = ComputeTarget(workspace=ws, name=cluster_name)
-    print("Found existing cluster, use it.")
-except ComputeTargetException:
-    compute_config = AmlCompute.provisioning_configuration(
-        vm_size="STANDARD_D2_V2", max_nodes=4, idle_seconds_before_scaledown=2400
-    )
-    cluster = ComputeTarget.create(ws, cluster_name, compute_config)
-cluster.wait_for_completion(show_output=True)
-```
-
-- We can also use the cli
-
-```yml
-# cluster_specs.yml
-$schema: https://azuremlschemas.azureedge.net/latest/amlCompute.schema.json
-name: mycluster
-type: amlcompute
-size: STANDARD_DS3_v2
-min_instances: 0
-max_instances: 2
-idle_time_before_scale_down: 1800
-tier: dedicated
-```
-
-Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --file $script_dir/cluster_specs.yml`
+- to create a new kedro project, run `kedro new`. The created folder is the working
+  directory for this repo. Note that i moved the requirments.txt outside of the src folder
+- Create pipeline with `kedro create pipeline <my_pipeline>`
+- Run a pipeline locally with `kedro run -p <my_pipeline>`
 
 
-- To automate this, you can also create a pipeline from `infrastructure/aml_compute_clusters/create_dev_compute_cluster.yml`
+### kedro-docker (skip if you already built ml env)
 
-- v2: compute cluster automatically created when deploying the infra
+- plugin to help create kedro docker images
+- we are only interested in creating the environment so the process is even easier here
+- Run `kedro docker init`: this will automatically create a Dockerfile, a .dockerignore
+  and a .dive-ci file to help with kedro deployment.
+- In the docker file, remove everything except the requirements part
+- Run `kedro docker build --image=<acrname>.azurecr.io/<your_image_name>:latest`
 
+- login to the azure container registry: `az acr login --name <acrname>`
+- push the image: `docker push <acrname>.azurecr.io/<your_image_name>:latest`
+
+- Finally, create the azure ml environment:
+  `az ml environment create --name <environment-name> --image <acrname>.azurecr.io/<your_image_name>:latest`
+  You will be able to see the environment on azure ml
+
+
+## Add mlflow to kedro
+
+https://kedro-mlflow.readthedocs.io/en/stable/
+
+- To use the kedro-mlflow plugin, run `kedro mlflow init`. This will create a
+  mlflow.yml file.
+- By default experiments are tracked locally.
+
+- If you are using azure ml, you can change it to point to the aml workspace: you can obtain it either by running `mlflow.get_tracking_uri()` from a notebook directly on the workspace or by running `az ml workspace show -n <workspacename>`. Note that when using the ui with `kedro mlflow ui`, you MUST also set the `MLFLOW_TRACKING_URI` env var to point to the same value. For some reason, artifacts are not loaded correctly if this var is not set
+
+- Note that if you launch your script on an azure ml compute instance or compute cluster, you don't need to modify anything (which is why the mlflow.yml file is not committed to source control)
 
 ## Submit an azure ml job
 
@@ -333,3 +283,62 @@ Note: Code used is stored on a container in the blob storage associated to a wor
 Note that the COMPUTE_NAME must be a cluster instance not a compute instance.
 Be careful because this works by sending all the data to storage before running the pipeline so we must be careful with the cost management. `Customize the .amlignore` file to exclude everything that you don't need for compute. Note that with kedro-azureml, `.amlignore` is not combined with your `.gitignore`
 
+- Launch a pipeline on azureml with `kedro azureml run -p <mypipeline>`
+
+
+## Track files with dvc (skip if using azureml data asset)
+
+- Run `dvc init`
+- Run the get_data.ipynb notebook to download the train and test file and put them
+  in data/01_raw
+
+### Local tracking
+
+- in `.dvc/config`, track everything locally:
+
+```
+['remote "localdvc"']
+    url = ../localdvc
+[core]
+    autostage = true
+    remote = localdvc
+```
+
+- Note: `autostage = true` will allow you to automatically stage a file when it is added
+  with dvc
+- Note2: the config file is saved to source control as it does not contain any sensitive info
+
+### Remote tracking
+
+- if you have a storage on azure instead, create a config.local file by running
+
+```bash
+dvc remote add blob azure://mycontainer/myfolder  --local
+```
+
+then in the .dvc/.config.local file:
+
+```bash
+['remote "blob"']
+    url = azure://mycontainer/myfolder
+    connection_string = <my_connection_string>
+[core]
+    remote = blob
+```
+
+Note that you can get the connection string: `az storage account show-connection-string --name <storageaccountname> --key key1`
+
+config.local is not committed to source control and is used in priority over config
+
+If you don't want to use a connection string, create a service principal (https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) and assign it the role Storage Blob Data Contributor in the IAM of the storage account, then in the config
+
+```bash
+['remote "blob"']
+    url = azure://mycontainer/myfolder
+    account_name = storageaccountname
+    tenant_id = <tenant-id>
+    client_id = <client-id>
+    client_secret = <client-secret> # must be created for the SP
+[core]
+    remote = blob
+```

@@ -1,9 +1,9 @@
-param baseName string
+param name string
 param location string
 param tags object
 
 resource appi 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'appi-${baseName}'
+  name: name
   location: location
   kind: 'web'
   properties: {

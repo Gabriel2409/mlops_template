@@ -1,10 +1,10 @@
-param baseName string
+param name string
 param location string
 param tags object
 
 // storage account and container
 resource st 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: 'st${baseName}'
+  name: name
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -41,7 +41,7 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01
 }
 
 resource storageContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: 'stc${baseName}'
+  name: 'stcamlcontainer'
   parent: blobServices
 }
 

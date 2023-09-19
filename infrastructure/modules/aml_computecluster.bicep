@@ -1,9 +1,8 @@
 param location string
-param computeClusterName string = 'cpu-cluster'
-param workspaceName string
+param name string
 
 resource mlwcc 'Microsoft.MachineLearningServices/workspaces/computes@2023-04-01' = {
-  name: '${workspaceName}/${computeClusterName}'
+  name: name
   location: location
   properties: {
     computeType: 'AmlCompute'

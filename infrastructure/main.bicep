@@ -11,22 +11,23 @@
 
 targetScope = 'resourceGroup'
 
-param location string = 'westeurope'
-param prefix string
-param postfix string
-param env string // azure devops environment
-param resource_group string // added because scope is resourceGroup, not subscription
+param location string
+param namespace string
+param environement string
+param resource_group string
+param aml_workspace string
+param application_insights string
+param key_vault string
+param container_registry string
+param storage_account string
 
 param tags object = {
   Owner: 'mlopstemplate'
   Project: 'mlopstemplate'
-  Environment: env
+  Environment: environement
   Toolkit: 'bicep'
-  Name: prefix
+  Name: namespace
 }
-
-var baseName  = '${prefix}-${postfix}${env}'
-// var resource_group = 'rg-${baseName}'
 
 // resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 //   name: resource_group
@@ -40,7 +41,7 @@ module st './modules/storage_account.bicep' = {
   name: 'st'
   scope: resourceGroup(resource_group)
   params: {
-    baseName: '${uniqueString(resourceGroup().id)}${env}'
+    name: storage_account
     location: location
     tags: tags
   }
@@ -51,7 +52,7 @@ module kv './modules/key_vault.bicep' = {
   name: 'kv'
   scope: resourceGroup(resource_group)
   params: {
-    baseName: baseName
+    name: key_vault
     location: location
     tags: tags
   }
@@ -62,7 +63,7 @@ module appi './modules/application_insights.bicep' = {
   name: 'appi'
   scope: resourceGroup(resource_group)
   params: {
-    baseName: baseName
+    name: application_insights
     location: location
     tags: tags
   }
@@ -73,7 +74,7 @@ module cr './modules/container_registry.bicep' = {
   name: 'cr'
   scope: resourceGroup(resource_group)
   params: {
-    baseName: '${uniqueString(resourceGroup().id)}${env}'
+    name: container_registry
     location: location
     tags: tags
   }
@@ -84,7 +85,7 @@ module mlw './modules/aml_workspace.bicep' = {
   name: 'mlw'
   scope: resourceGroup(resource_group)
   params: {
-    baseName: baseName
+    name: aml_workspace
     location: location
     stoacctid: st.outputs.stOut
     kvid: kv.outputs.kvOut
@@ -93,7 +94,6 @@ module mlw './modules/aml_workspace.bicep' = {
     tags: tags
   }
 }
-
 
 // AML compute cluster
 // module mlwcc './modules/aml_computecluster.bicep' = {

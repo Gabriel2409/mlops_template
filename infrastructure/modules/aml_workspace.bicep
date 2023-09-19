@@ -1,4 +1,4 @@
-param baseName string
+param name string
 param location string
 param stoacctid string
 param kvid string
@@ -8,7 +8,7 @@ param tags object
 
 // AML workspace
 resource mlw 'Microsoft.MachineLearningServices/workspaces@2023-04-01' = {
-  name: 'mlw-${baseName}'
+  name: name
   location: location
   identity: {
     type: 'SystemAssigned'

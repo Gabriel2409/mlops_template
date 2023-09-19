@@ -41,12 +41,15 @@ stages :
             scriptLocation: 'inlineScript'
             # inlineScript: |
             #   az deployment sub validate \
+            #   --name $(Build.DefinitionName) \
+            #   --template-file ./infrastructure/main.bicep \
+            #   --location $(location) \
+            #   --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
             inlineScript: |
               az deployment group validate \
                 --resource-group $(resource_group) \
                 --name $(Build.DefinitionName) \
                 --template-file ./infrastructure/main.bicep \
-                --location $(location) \
                 --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
 
   - stage: CheckOutBicepAndDeploy

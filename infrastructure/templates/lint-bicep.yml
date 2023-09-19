@@ -4,12 +4,15 @@ parameters:
   - name: bicepFile
     type: string
 
-jobs:
-  - job: LintBicep
-    displayName: Lint Bicep Code
-    steps:
-      - checkout: self
-      - script: |
-          az bicep build --file ./infrastructure/main.bicep
-        name: LintBicepCode
-        displayName: Run Bicep Linter
+stages:
+  - stage: Lint
+    displayName: Lint and Preflight check
+    jobs:
+      - job: LintBicep
+        displayName: Lint Bicep Code
+        steps:
+          - checkout: self
+          - script: |
+              az bicep build --file ./infrastructure/main.bicep
+            name: LintBicepCode
+            displayName: Run Bicep Linter

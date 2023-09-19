@@ -6,26 +6,28 @@ parameters:
   - name: bicepFile
     type: string
 
-jobs:
-  - job: ValidateBicepCode
-    displayName: Validate Bicep Code (Rg level)
-    steps:
-      - task: AzureCli@2
-        name: RunPreflightValidateion
-        displayName: Run Preflight Validation
-        inputs:
-          azureSubscription: $(ado_service_connection_rg)
-          scriptType: "bash"
-          scriptLocation: "inlineScript"
-          # inlineScript: |
-          #   az deployment sub validate \
-          #   --name $(Build.DefinitionName) \
-          #   --template-file $(bicepFile) \
-          #   --location $(location) \
-          #   --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
-          inlineScript: |
-            az deployment group validate \
-              --resource-group $(resource_group) \
-              --name $(Build.DefinitionName) \
-              --template-file $(bicepFile) \
-              --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment) resource_group=$(resource_group)
+stages:
+  - stage: PreflightValidation
+    jobs:
+      - job: ValidateBicepCode
+        displayName: Validate Bicep Code (Rg level)
+        steps:
+          - task: AzureCli@2
+            name: RunPreflightValidateion
+            displayName: Run Preflight Validation
+            inputs:
+              azureSubscription: $(ado_service_connection_rg)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              # inlineScript: |
+              #   az deployment sub validate \
+              #   --name $(Build.DefinitionName) \
+              #   --template-file $(bicepFile) \
+              #   --location $(location) \
+              #   --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
+              inlineScript: |
+                az deployment group validate \
+                  --resource-group $(resource_group) \
+                  --name $(Build.DefinitionName) \
+                  --template-file $(bicepFile) \
+                  --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment) resource_group=$(resource_group)

@@ -39,4 +39,8 @@ stages:
                         --resource-group $(resource_group) \
                         --name $(Build.DefinitionName) \
                         --template-file $(bicepFile) \
-                        --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
+                        --parameters location=$(location) namespace=$(namespace) \
+                        environement=$(environment) resource_group=$(resource_group) \
+                        aml_workspace=$(aml_workspace) application_insights=$(application_insights) \
+                        key_vault=$(key_vault) container_registry=$(container_registry) \
+                        storage_account=$(storage_account)

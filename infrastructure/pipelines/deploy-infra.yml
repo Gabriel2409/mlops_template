@@ -43,7 +43,7 @@ stages :
             #   az deployment sub validate \
             inlineScript: |
               az deployment group validate \
-                --resource-group $(resource_group)
+                --resource-group $(resource_group) \
                 --name $(Build.DefinitionName) \
                 --template-file ./infrastructure/main.bicep \
                 --location $(location) \

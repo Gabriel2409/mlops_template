@@ -15,7 +15,7 @@ param location string = 'westeurope'
 param prefix string
 param postfix string
 param env string // azure devops environment
-param resourceGroupName string // added because scope is resourceGroup, not subscription
+param resource_group string // added because scope is resourceGroup, not subscription
 
 param tags object = {
   Owner: 'mlopstemplate'
@@ -26,10 +26,10 @@ param tags object = {
 }
 
 var baseName  = '${prefix}-${postfix}${env}'
-// var resourceGroupName = 'rg-${baseName}'
+// var resource_group = 'rg-${baseName}'
 
 // resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-//   name: resourceGroupName
+//   name: resource_group
 //   location: location
 
 //   tags: tags
@@ -38,7 +38,7 @@ var baseName  = '${prefix}-${postfix}${env}'
 // Storage Account
 module st './modules/storage_account.bicep' = {
   name: 'st'
-  scope: resourceGroup(resourceGroupName)
+  scope: resourceGroup(resource_group)
   params: {
     baseName: '${uniqueString(resourceGroup().id)}${env}'
     location: location
@@ -49,7 +49,7 @@ module st './modules/storage_account.bicep' = {
 // Key Vault
 module kv './modules/key_vault.bicep' = {
   name: 'kv'
-  scope: resourceGroup(resourceGroupName)
+  scope: resourceGroup(resource_group)
   params: {
     baseName: baseName
     location: location
@@ -60,7 +60,7 @@ module kv './modules/key_vault.bicep' = {
 // App Insights
 module appi './modules/application_insights.bicep' = {
   name: 'appi'
-  scope: resourceGroup(resourceGroupName)
+  scope: resourceGroup(resource_group)
   params: {
     baseName: baseName
     location: location
@@ -71,7 +71,7 @@ module appi './modules/application_insights.bicep' = {
 // Container Registry
 module cr './modules/container_registry.bicep' = {
   name: 'cr'
-  scope: resourceGroup(resourceGroupName)
+  scope: resourceGroup(resource_group)
   params: {
     baseName: '${uniqueString(resourceGroup().id)}${env}'
     location: location
@@ -82,7 +82,7 @@ module cr './modules/container_registry.bicep' = {
 // AML workspace
 module mlw './modules/aml_workspace.bicep' = {
   name: 'mlw'
-  scope: resourceGroup(resourceGroupName)
+  scope: resourceGroup(resource_group)
   params: {
     baseName: baseName
     location: location
@@ -98,7 +98,7 @@ module mlw './modules/aml_workspace.bicep' = {
 // AML compute cluster
 // module mlwcc './modules/aml_computecluster.bicep' = {
 //   name: 'mlwcc'
-//   scope: resourceGroup(resourceGroupName)
+//   scope: resourceGroup(resource_group)
 //   params: {
 //     location: location
 //     workspaceName: mlw.outputs.mlwName

@@ -50,7 +50,7 @@ stages :
                 --resource-group $(resource_group) \
                 --name $(Build.DefinitionName) \
                 --template-file ./infrastructure/main.bicep \
-                --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)
+                --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment) resource_group=$(resource_group)
 
   - stage: CheckOutBicepAndDeploy
     displayName: Deploy AML Workspace

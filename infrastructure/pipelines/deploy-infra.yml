@@ -16,12 +16,12 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
-  - template: ./infrastructure/templates/lint-bicep.yml
+  - template: ../templates/lint-bicep.yml
     parameters:
       bicepFile: $(bicepFile)
-  - template: ./infrastructure/templates/validate-bicep-rg-level.yml
+  - template: ../templates/validate-bicep-rg-level.yml
     parameters:
       bicepFile: $(bicepFile)
-  - template: ./infrastructure/templates/deploy-bicep-rg-level.yml
+  - template: ../templates/deploy-bicep-rg-level.yml
     parameters:
       bicepFile: $(bicepFile)

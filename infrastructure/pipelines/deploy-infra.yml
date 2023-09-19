@@ -6,7 +6,8 @@ variables:
   #     # 'develop' or feature branches: DEV environment
   #     - template: ../config-infra-dev.yml
   - template: ../config-infra-prod.yml
-    bicepFile: "./infrastructure/main.bicep"
+  - name: bicepFile
+    value: "./infrastructure/main.bicep"
 
 trigger:
   - none

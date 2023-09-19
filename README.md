@@ -1,6 +1,8 @@
 # Mlops template
 
-Heavily inspired by https://madewithml.com/
+## Resources
+- https://madewithml.com/ + wayback machine (july 23 for old course). Data from here
+- https://github.com/Azure/mlops-v2: used to create a fast template for azureml + azuredevops
 
 ## First install
 
@@ -41,7 +43,7 @@ az ad sp create-for-rbac \
 
 - no need to create a SP manually, instead go to project settings > service connections
   then choose Azure Resource manager and configure the SP here
-- Note: if you go to `App registrations` in azure portal, you shoudl see the service principal
+- Note: if you go to `App registrations` in azure portal, you should see the service principal
 
 - Create a new variable group named mlopsvars (Pipelines / Library) and you can easily add variables.
 - Add `AZURE_RG`, `AZURE_LOCATION`, `BASE_NAME` and `AZURE_RM_SVC_CONNECTION` (the name of the connector that was just created)
@@ -195,6 +197,10 @@ env.register(workspace=ws)
 
 `az ml environment create --resource-group <rg> --workspace-name <ws> --image mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest --conda-file conda-dependencies.yaml --name <env_name>`
 
+
+- To automate this, you can also create a pipeline from `infrastructure/aml_environments/create_cpu_env.yaml`
+
+
 - TODO: Microsoft also has a list of prebuilt images for inference. It might be worth checking out
 
 ## Create a compute cluster for jobs and ml pipelines
@@ -234,6 +240,10 @@ tier: dedicated
 ```
 
 Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --file $script_dir/cluster_specs.yml`
+
+
+- To automate this, you can also create a pipeline from `infrastructure/aml_compute_clusters/create_dev_compute_cluster.yml`
+
 
 ## Submit an azure ml job
 

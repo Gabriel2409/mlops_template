@@ -94,12 +94,13 @@ module mlw './modules/aml_workspace.bicep' = {
   }
 }
 
-// AML compute cluster
-// module mlwcc './modules/aml_computecluster.bicep' = {
-//   name: 'mlwcc'
-//   scope: resourceGroup(resource_group)
-//   params: {
-//     location: location
-//     workspaceName: mlw.outputs.mlwName
-//   }
-// }
+module mlwcc './modules/aml_cpu_computecluster.bicep' = {
+  name: 'mlwcc'
+  dependsOn: [ mlw ]
+  scope: resourceGroup(resource_group)
+  params: {
+    location: location
+    name: 'cpu-cluster'
+    aml_workspace: aml_workspace
+  }
+}

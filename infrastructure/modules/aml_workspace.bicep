@@ -34,4 +34,4 @@ resource mlw 'Microsoft.MachineLearningServices/workspaces@2023-04-01' = {
   tags: tags
 }
 
-output mlwName string = mlw.name
+output mlwOut string = mlw.id

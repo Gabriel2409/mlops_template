@@ -15,10 +15,18 @@ pip install -r requirements.txt
 
 ## Provision dev resources on azure
 
+- To use azure ml studio, you need the infrastructure, a compute cluster to run the pipelines
+and a ml environment (which is different from the devops environement).
+- Here, the compute cluster is included in the devops environement but not the ml environment
+as the ml environment is the longest to build + it changes a lot and should not be tied to
+a given infrastructure. This is why you will find an arm template for the cluster but not the
+ml environment
+
+
 ### Manual Deployment
 
 - you can manually deploy the azure infrastructure with
-  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters infrastructure/dev_resources/default_parameters.bicepparam`
+  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters <myfile.bicepparm>`
 
 ### Deployment with github actions (if repo is on github)
 
@@ -41,14 +49,35 @@ az ad sp create-for-rbac \
 
 ### Deployment with azure devops (if repo is on azure devops)
 
+
+#### Notes:
+
+in `infrastructure` folder, you can deploy either using `aml_compute_clusters`, `aml_environements`
+and `dev_resources` folders.
+However, I changed the way to deploy and you can instead use the `pipelines` subfolders
+which calls `modules` and `templates` folders. This is probably better as it uses arm templates
+for everything
+
+
 - no need to create a SP manually, instead go to project settings > service connections
   then choose Azure Resource manager and configure the SP here
 - Note: if you go to `App registrations` in azure portal, you should see the service principal
+
+#### v1
 
 - Create a new variable group named mlopsvars (Pipelines / Library) and you can easily add variables.
 - Add `AZURE_RG`, `AZURE_LOCATION`, `BASE_NAME` and `AZURE_RM_SVC_CONNECTION` (the name of the connector that was just created)
 - Optionally click on the lock to make the variables secrets
 - create a pipeline using `deploy_dev_resources_azdvops.yml`
+
+#### v2
+
+Since then I improved the deployment. Use `infrastructure/pipelines/deploy-infra.yml` instead, no need to add variables
+in azure devops. Instead, modify the `config-infra-prod.yml` file
+
+NOTE: Further down in the readme, there are methods to deploy environements and clusters without using arm templates.
+However, you can create a pipeline with `deploy-aml-cpu-computecluster.yml` and `deploy-cpu-env.yml` if you want to use
+arm templates instead.
 
 ### QoL
 
@@ -243,6 +272,8 @@ Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --fil
 
 
 - To automate this, you can also create a pipeline from `infrastructure/aml_compute_clusters/create_dev_compute_cluster.yml`
+
+- v2: compute cluster automatically created when deploying the infra
 
 
 ## Submit an azure ml job

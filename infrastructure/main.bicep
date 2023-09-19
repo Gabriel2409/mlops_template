@@ -10,7 +10,6 @@
 // permission to deploy them, only machine learning workspace level permissions.
 
 targetScope = 'resourceGroup'
-
 param location string
 param namespace string
 param environement string

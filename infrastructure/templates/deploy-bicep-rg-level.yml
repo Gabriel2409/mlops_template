@@ -36,6 +36,7 @@ stages:
                       az --version
                       echo "deploying bicep..."
                       az deployment group create \
+                        --resource-group $(resource_group) \
                         --name $(Build.DefinitionName) \
                         --template-file $(bicepFile) \
                         --parameters location=$(location) prefix=$(namespace) postfix=$(postfix) env=$(environment)

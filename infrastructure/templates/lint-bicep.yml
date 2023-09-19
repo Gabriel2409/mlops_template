@@ -1,0 +1,17 @@
+# template pipeline used to lint bicep code for all arm deployments
+
+parameters:
+  - name: bicepFile
+    type: string
+
+stage: Lint
+displayName: Lint and Preflight check
+jobs:
+  - job: LintBicep
+    displayName: Lint Bicep Code
+    steps:
+      - checkout: self
+      - script: |
+          az bicep build --file ./infrastructure/main.bicep
+        name: LintBicepCode
+        displayName: Run Bicep Linter

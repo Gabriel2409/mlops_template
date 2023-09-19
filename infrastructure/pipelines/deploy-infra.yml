@@ -16,12 +16,17 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
-  - template: ../templates/lint-bicep.yml
+  - stage: Lint
+    displayName: Lint and Preflight check
+    template: ../templates/lint-bicep.yml
     parameters:
       bicepFile: $(bicepFile)
-  - template: ../templates/validate-bicep-rg-level.yml
+  - stage: PreflightValidation
+    template: ../templates/validate-bicep-rg-level.yml
     parameters:
       bicepFile: $(bicepFile)
-  - template: ../templates/deploy-bicep-rg-level.yml
+  - stage: CheckOutBicepAndDeploy
+    displayName: Deploy Bicep resources
+    template: ../templates/deploy-bicep-rg-level.yml
     parameters:
       bicepFile: $(bicepFile)

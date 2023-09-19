@@ -6,7 +6,6 @@ parameters:
   - name: bicepFile
     type: string
 
-stage: PreflightValidation
 jobs:
   - job: ValidateBicepCode
     displayName: Validate Bicep Code (Rg level)

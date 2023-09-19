@@ -4,8 +4,6 @@ parameters:
   - name: bicepFile
     type: string
 
-stage: Lint
-displayName: Lint and Preflight check
 jobs:
   - job: LintBicep
     displayName: Lint Bicep Code

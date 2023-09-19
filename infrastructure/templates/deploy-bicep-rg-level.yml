@@ -4,8 +4,6 @@ parameters:
   - name: bicepFile
     type: string
 
-stage: CheckOutBicepAndDeploy
-displayName: Deploy Bicep resources
 jobs:
   - deployment: DevDeployBicep
     displayName: Deploy Bicep (Rg level)

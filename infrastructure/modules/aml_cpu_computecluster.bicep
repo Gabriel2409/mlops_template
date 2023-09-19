@@ -1,8 +1,9 @@
 param location string
+param aml_workspace string
 param name string
 
 resource mlwcc 'Microsoft.MachineLearningServices/workspaces/computes@2023-04-01' = {
-  name: name
+  name: '${aml_workspace}/${name}'
   location: location
   properties: {
     computeType: 'AmlCompute'

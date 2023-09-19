@@ -13,6 +13,6 @@ stages:
         steps:
           - checkout: self
           - script: |
-              az bicep build --file ./infrastructure/main.bicep
+              az bicep build --file $(bicepFile)
             name: LintBicepCode
             displayName: Run Bicep Linter

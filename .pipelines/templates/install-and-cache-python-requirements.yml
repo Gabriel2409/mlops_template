@@ -14,12 +14,10 @@ steps:
       cacheHitVar: cache_restored
 
   - script: |
-      echo "Cache Hit, skipping installing requirements
-    displayName: Cach Hit
-    condition: eq(variables.cache_restored, 'true')
-
-  - script: |
-      echo "Cache miss, installing dependencies"
-      pip install -r requirements.txt
-    displayName: Install dependencies
-    condition: eq(variables.cache_restored, 'false')
+      if [ "$(cache_restored)" == "true" ]; then
+        echo "Cache hit! Skipping installation of requirements."
+      else
+        echo "Cache miss! Installing dependencies..."
+        pip install -r requirements.txt
+      fi
+    displayName: 'Install or Skip Dependencies'

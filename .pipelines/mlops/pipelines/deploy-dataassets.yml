@@ -1,0 +1,35 @@
+# simulates an ETL process to create a new version of the datasets
+# (here we just copy files from one place to another)
+# Done with kedro-azureml using the compute cluster of the aml workspace.
+# In a real scenario, would probably be done without using the wokspace compute cluster
+
+variables:
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'main' branch: PRD environment
+  #     - template: ../../config-infra-prod.yml
+  # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'develop' or feature branches: DEV environment
+  #     - template: ../../config-infra-dev.yml
+  - template: ../../config-infra-prod.yml
+  - name: kedro_pipeline_name
+    value: create_azure_dataasset_from_local_files
+
+trigger:
+  - none
+
+pool:
+  vmImage: $(ap_vm_image)
+
+stages:
+  - stage: CreateDataAssets
+    displayName: Create Data Assets
+    jobs:
+      - job: CreateDataAssets
+        steps:
+          - checkout: self
+          - template: ../../templates/install-aml-cli.yml
+          - template: ../../templates/connect-to-workspace.yml
+          - template: ../../templates/install-python-requirements.yml
+          - template: ../../templates/launch-kedro-azureml-pipeline.yml
+            parameters:
+              kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}

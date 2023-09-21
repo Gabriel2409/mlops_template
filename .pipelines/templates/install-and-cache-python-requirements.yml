@@ -10,7 +10,7 @@ steps:
     displayName: Cache pip
     inputs:
       key: 'pip | "$(Agent.OS)" | requirements.txt'
-      path: $(pip_cache_dir)
+      path: ${{ parameters.pip_cache_dir }}
       cacheHitVar: cache_restored
 
   - script: |

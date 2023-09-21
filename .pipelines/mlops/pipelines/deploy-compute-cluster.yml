@@ -10,7 +10,7 @@ variables:
   #     # 'develop' or feature branches: DEV environment
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
-  - template: ../compute_cluster_specs.yml
+  - template: ../modules/compute_cluster_specs.yml
 
 trigger:
   - none

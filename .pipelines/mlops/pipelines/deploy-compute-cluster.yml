@@ -25,7 +25,7 @@ stages:
       - job: DeployComputeCluster
         steps:
           - checkout: self
-          - template: ../../templates/intall-aml-cli.yml
+          - template: ../../templates/install-aml-cli.yml
           - template: ../../templates/connect-to-workspace.yml
           - template: ../../templates/create-compute.yml
             parameters:

@@ -7,7 +7,7 @@ steps:
   - script: mkdir -p ${{ parameters.pip_cache_dir }}
     displayName: 'Create Cache Directory'
   - task: Cache@2
-    displayName: Cache pip requirements
+    displayName: Check for cached dependencies
     inputs:
       key: 'pip | "$(Agent.OS)" | requirements.txt'
       path: ${{ parameters.pip_cache_dir }}

@@ -21,15 +21,12 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
-  - stage: InstallRequirements
-    displayName: Install the python requirements
-    jobs:
-      - job: InstallRequirements
-        steps:
-          - template: ../../templates/install-python-requirements.yml
   - stage: CreateDataAssets
-    displayName: Create Data Assets
     jobs:
+      - template: ../../templates/install-and-cache-python-requirements-jobs.yml
+        parameters:
+          pythonVersion: "3.10"
+          requirementsFilePath: requirements.txt
       - job: CreateDataAssets
         steps:
           - checkout: self

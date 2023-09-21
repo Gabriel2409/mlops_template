@@ -1,11 +1,18 @@
+# actual training pipeline. kedro-azureml makes this a lot easier.
+# Parameters are in conf/base/parameters but they are stored in the run anyways,
+# which is why there is no option to overwrite them
+
+
 variables:
   # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
   #     # 'main' branch: PRD environment
-  #     - template: ../config-infra-prod.yml
+  #     - template: ../../config-infra-prod.yml
   # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
   #     # 'develop' or feature branches: DEV environment
-  #     - template: ../config-infra-dev.yml
-  - template: ../config-infra-prod.yml
+  #     - template: ../../config-infra-dev.yml
+  - template: ../../config-infra-prod.yml
+  - name: kedro_pipeline_name
+    value: create_azure_dataasset_from_local_files
 
 trigger:
   - none
@@ -14,11 +21,17 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
-  - stage: DeployTrainingPipeline
-    displayName: Deploy Training Pipeline
+  - stage: CreateDataAssets
+    displayName: Create Data Assets
     jobs:
-      - job: DeployTrainingPipeline
-        timeoutInMinutes: 120 # how long to run the job before automatically cancelling
+      - job: CreateDataAssets
         steps:
-          - template: ../templates/intall-aml-cli.yml
-          - template: ../templates/connect-to-workspace.yml # we could also create env and compute here but i prefer to do it separately
+          - checkout: self
+          - template: ../../templates/install-aml-cli.yml
+          - template: ../../templates/connect-to-workspace.yml
+          - template: ../../templates/install-python-requirements.yml
+          # todo: add unit test pipeline
+          - template: ../../templates/launch-kedro-azureml-pipeline.yml
+            parameters:
+              kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}
+

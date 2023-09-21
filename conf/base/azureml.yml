@@ -4,11 +4,11 @@ azure:
   # Azure ML Experiment Name
   experiment_name: "mlops_template"
   # Azure resource group to use
-  resource_group: "mlops"
+  resource_group: "rg-mlopstpl-4876prod"
   # Azure ML Workspace name
-  workspace_name: "mlopstplamlws"
+  workspace_name: "mlw-mlopstpl-4876prod"
   # Azure ML Environment to use during pipeline execution
-  environment_name: mlopstpl-cpu-env:1
+  environment_name: mlops-tpl-train-env@latest
   # Path to directory to upload, or null to disable code upload
   code_directory: .
   # Path to the directory in the Docker image to run the code from
@@ -25,16 +25,16 @@ azure:
     # It's recommended to set Lifecycle management rule for storage container, to avoid costs of long-term storage
     # of the temporary data. Temporary data will be stored under abfs://<containter>/kedro-azureml-temp path
     # See https://docs.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-configure?tabs=azure-portal
-    account_name: mlopstplamlsafxgc0045
+    account_name: na
     # Name of the storage container
-    container: mlopstplamlsac
+    container: na
   compute:
     # Azure compute used for running kedro jobs.
     # Additional compute cluster can be defined here. Individual nodes can reference specific compute clusters by adding
     # the section title (e.g. <your_node_tag>) as a node_tag to their tags list. Nodes without a tag will run on
     # __default__ cluster.
     __default__:
-      cluster_name: "cpu-dev-cluster"
+      cluster_name: "cpu-cluster"
     # <your_node_tag>:
     #   cluster_name: "<your_cluster_name>"
 docker:

@@ -30,6 +30,7 @@ stages:
           - template: ../../templates/install-aml-cli.yml
           - template: ../../templates/connect-to-workspace.yml
           - template: ../../templates/install-python-requirements.yml
+          # todo: add unit test pipeline
           - template: ../../templates/launch-kedro-azureml-pipeline.yml
             parameters:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}

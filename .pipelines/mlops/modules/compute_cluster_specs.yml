@@ -1,6 +1,6 @@
 # specs for the compute cluster. See templates/create-compute.yml
 variables:
-  cluster_name: cpu-prod-cluster
+  cluster_name: cpu-cluster
   cluster_size: Standard_DS3_v2
   cluster_min_instances: 0
   cluster_max_instances: 2

@@ -1,0 +1,13 @@
+parameters:
+  - name: kedro_pipeline_name
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Launch kedro pipeline"
+    inputs:
+      azureSubscription: $(ado_service_connection_aml_ws)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        kedro azureml run -p ${{ parameters.kedro_pipeline_name }} --wait-for-completion

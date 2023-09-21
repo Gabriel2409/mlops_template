@@ -22,7 +22,7 @@ stages:
       - job: RegisterAmlEnv
         steps:
           - checkout: self
-          - template: ../../templates/intall-aml-cli.yml
+          - template: ../../templates/install-aml-cli.yml
           - template: ../../templates/connect-to-workspace.yml
           - template: ../../templates/register-aml-env.yml
             parameters:

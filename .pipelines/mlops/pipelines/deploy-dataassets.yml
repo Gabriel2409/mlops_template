@@ -21,6 +21,12 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
+  - stage: InstallRequirements
+    displayName: Install the python requirements
+    jobs:
+      - job: InstallRequirements
+        steps:
+          - template: ../../templates/install-python-requirements.yml
   - stage: CreateDataAssets
     displayName: Create Data Assets
     jobs:
@@ -29,7 +35,6 @@ stages:
           - checkout: self
           - template: ../../templates/install-aml-cli.yml
           - template: ../../templates/connect-to-workspace.yml
-          - template: ../../templates/install-python-requirements.yml
           # todo: add unit test pipeline
           - template: ../../templates/launch-kedro-azureml-pipeline.yml
             parameters:

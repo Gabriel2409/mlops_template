@@ -16,7 +16,7 @@ steps:
   - script: |
       echo "Cache Hit, skipping installing requirements
     displayName: Cach Hit
-    condition: eq(variables.cache_restored, 'tru')
+    condition: eq(variables.cache_restored, 'true')
 
   - script: |
       echo "Cache miss, installing dependencies"

@@ -12,43 +12,28 @@ jobs:
   - job: CheckCache
     steps:
       - script: |
-          requirements_hash=$(sha256sum $(requirementsFilePath) | cut -d' ' -f1)
+          requirements_hash=$(sha256sum $(parameters.requirementsFilePath) | cut -d' ' -f1)
           echo "Requirements file hash: $requirements_hash"
           echo "##vso[task.setvariable variable=requirementsHash;isOutput=true]$requirements_hash"
         displayName: Calculate Requirements File Hash
 
-      - script: |
-          current_requirements_hash="$(requirementsHash)"
-          cached_requirements_hash="${{ dependencies.CheckCache.outputs['CacheRequirementsHash'] }}"
-
-          if [ "$current_requirements_hash" == "$cached_requirements_hash" ]; then
-              echo "Cache hit! Requirements file unchanged. Restoring dependencies from cache."
-              echo "##vso[task.setvariable variable=cacheHit;isOutput=true]true"
-          else
-              echo "Cache miss! Requirements file changed. Installing dependencies."
-              echo "##vso[task.setvariable variable=cacheHit;isOutput=true]false"
-          fi
-        displayName: Check Cache Status
   - job: InstallRequirements
     dependsOn: CheckCache
-    condition: eq(dependencies.CheckCache.outputs['cacheHit'], 'false')
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: $(pythonVersion)
-          addToPath: true
-
-      - script: |
-          echo "Installing Python requirements..."
-          pip install -r $(requirementsFilePath)
-          echo "Installed Python requirements."
-        displayName: Install Python Requirements
+      - ${{ if eq(dependencies.CheckCache.outputs['requirementsHash'], variables.requirementsHash) }}:
+        - script: echo "Cache hit! Requirements file unchanged. Restoring dependencies from cache."
+          displayName: Cache Hit
+      - ${{ if ne(dependencies.CheckCache.outputs['requirementsHash'], variables.requirementsHash) }}:
+        - script: |
+            echo "Cache miss! Requirements file changed. Installing dependencies."
+            pip install -r $(parameters.requirementsFilePath)
+            echo "Installed Python requirements."
+          displayName: Install Python Requirements
 
   - job: CacheRequirements
     dependsOn: InstallRequirements
-    condition: eq(dependencies.InstallRequirements.result, 'Succeeded')
     steps:
       - script: |
           echo "Caching Python dependencies..."
-          echo "##vso[task.setvariable variable=CacheRequirementsHash]$requirementsHash"
+          echo "##vso[task.setvariable variable=CacheRequirementsHash;isOutput=true]$(variables.requirementsHash)"
         displayName: Cache Dependencies

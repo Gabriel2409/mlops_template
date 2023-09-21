@@ -7,7 +7,7 @@ variables:
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
   - name: bicepFile
-    value: "$(Pipeline.Workspace)/.pipelines/infrastructure/main.bicep"
+    value: ./.pipelines/infrastructure/main.bicep
 
 trigger:
   - none

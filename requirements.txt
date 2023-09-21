@@ -1,6 +1,6 @@
 azureml-core~=1.52.0
 azureml-mlflow~=1.52.0
-# black
+black
 # dvc[azure]
 # flake8
 # ipython

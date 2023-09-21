@@ -1,13 +1,13 @@
 parameters:
-  # variables are automatically exported as environment variables
-  # so this will override pip's default cache dir
   - name: pip_cache_dir
     type: string
     default: $(Pipeline.Workspace)/.pip
 
 steps:
+  - script: mkdir -p ${{ parameters.pip_cache_dir }}
+    displayName: 'Create Cache Directory'
   - task: Cache@2
-    displayName: Cache pip
+    displayName: Cache pip requirements
     inputs:
       key: 'pip | "$(Agent.OS)" | requirements.txt'
       path: ${{ parameters.pip_cache_dir }}

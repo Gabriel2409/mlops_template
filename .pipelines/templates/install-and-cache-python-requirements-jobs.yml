@@ -18,8 +18,8 @@ jobs:
         displayName: Calculate Requirements File Hash
 
       - script: |
-          current_requirements_hash="${requirementsHash}"
-          cached_requirements_hash="${{ dependencies.CacheRequirementsHash }}"
+          current_requirements_hash="${{ requirementsHash }}"
+          cached_requirements_hash="${{ dependencies.CheckCache.outputs['CacheRequirementsHash'] }}"
 
           if [ "$current_requirements_hash" == "$cached_requirements_hash" ]; then
               echo "Cache hit! Requirements file unchanged. Restoring dependencies from cache."
@@ -51,5 +51,5 @@ jobs:
     steps:
       - script: |
           echo "Caching Python dependencies..."
-          echo "##vso[task.setvariable variable=Dependencies.CacheRequirementsHash]$requirementsHash"
+          echo "##vso[task.setvariable variable=CacheRequirementsHash]$requirementsHash"
         displayName: Cache Dependencies

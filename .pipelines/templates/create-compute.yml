@@ -1,13 +1,13 @@
 parameters:
   - name: cluster_name
     type: string
-  - name: size
+  - name: cluster_size
     type: string
-  - name: min_instances
+  - name: cluster_min_instances
     type: number
-  - name: max_instances
+  - name: cluster_max_instances
     type: number
-  - name: idle_seconds_before_scaledown
+  - name: cluster_idle_seconds_before_scaledown
     type: number
   - name: cluster_tier
     type: string

@@ -12,7 +12,7 @@ steps:
   - task: Cache@2
     displayName: Cache pip packages
     inputs:
-      key: 'pip | "$(Agent.OS)" | ${{ requirements_file }}'
+      key: 'pip | "$(Agent.OS)" | ${{ parameters.requirements_file }}'
       path: ${{ parameters.pip_cache_dir }}
       cacheHitVar: pip_cached
 
@@ -23,5 +23,5 @@ steps:
         echo "Cache miss! Installing dependencies..."
       fi
 
-      pip install -rx ${{ requirements_file }}
+      pip install -r ${{ parameters.requirements_file }}
     displayName: "Install Dependencies"

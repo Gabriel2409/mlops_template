@@ -29,9 +29,9 @@ stages:
           - template: ../../templates/connect-to-workspace.yml
           - template: ../../templates/create-compute.yml
             parameters:
-              cluster_name: $(cluster_name)
-              cluster_size: $(cluster_size)
-              cluster_min_instances: 0
-              cluster_max_instances: $(cluster_max_instances)
-              cluster_idle_seconds_before_scaledown: $(cluster_idle_seconds_before_scaledown)
-              cluster_tier: $(cluster_tier)
+              cluster_name: ${{ variables.cluster_name }}
+              cluster_size: ${{ variables.cluster_size }}
+              cluster_min_instances: ${{ variables.cluster_min_instances }}
+              cluster_max_instances: ${{ variables.cluster_max_instances }}
+              cluster_idle_seconds_before_scaledown: ${{ variables.cluster_idle_seconds_before_scaledown }}
+              cluster_tier: ${{ variables.cluster_tier }}

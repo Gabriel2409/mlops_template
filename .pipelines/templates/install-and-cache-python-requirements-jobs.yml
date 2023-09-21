@@ -3,10 +3,10 @@
 parameters:
   - name: pythonVersion
     type: string
-    default: "3.10"  # Default Python version
+    default: "3.10" # Default Python version
   - name: requirementsFilePath
     type: string
-    default: "requirements.txt"  # Default requirements file path
+    default: "requirements.txt" # Default requirements file path
 
 jobs:
   - job: CheckCache
@@ -18,7 +18,7 @@ jobs:
         displayName: Calculate Requirements File Hash
 
       - script: |
-          current_requirements_hash="${{ requirementsHash }}"
+          current_requirements_hash="$(requirementsHash)"
           cached_requirements_hash="${{ dependencies.CheckCache.outputs['CacheRequirementsHash'] }}"
 
           if [ "$current_requirements_hash" == "$cached_requirements_hash" ]; then
@@ -29,7 +29,6 @@ jobs:
               echo "##vso[task.setvariable variable=cacheHit;isOutput=true]false"
           fi
         displayName: Check Cache Status
-
   - job: InstallRequirements
     dependsOn: CheckCache
     condition: eq(dependencies.CheckCache.outputs['cacheHit'], 'false')

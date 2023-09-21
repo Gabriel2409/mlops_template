@@ -2,22 +2,26 @@ parameters:
   - name: pip_cache_dir
     type: string
     default: $(Pipeline.Workspace)/.pip
+  - name: requirements_file
+    type: string
+    default: requirements.txt
 
 steps:
   - script: mkdir -p ${{ parameters.pip_cache_dir }}
-    displayName: 'Create Cache Directory'
+    displayName: "Create Cache Directory"
   - task: Cache@2
-    displayName: Check for cached dependencies
+    displayName: Cache pip packages
     inputs:
-      key: 'pip | "$(Agent.OS)" | requirements.txt'
+      key: 'pip | "$(Agent.OS)" | ${{ requirements_file }}'
       path: ${{ parameters.pip_cache_dir }}
-      cacheHitVar: cache_restored
+      cacheHitVar: pip_cached
 
   - script: |
-      if [ "$(cache_restored)" == "true" ]; then
-        echo "Cache hit! Skipping installation of requirements."
+      if [ "$(pip_cached)" == "true" ]; then
+        echo "Cache hit! Installing dependencies from cache..."
       else
         echo "Cache miss! Installing dependencies..."
-        pip install -r requirements.txt
       fi
-    displayName: 'Install or Skip Dependencies'
+
+      pip install -rx ${{ requirements_file }}
+    displayName: "Install Dependencies"

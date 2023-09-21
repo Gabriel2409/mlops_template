@@ -8,6 +8,8 @@ variables:
   #     # 'develop' or feature branches: DEV environment
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
+  - name: environmentFile
+    value: ./.pipelines/mlops/modules/train_env_specs.yml
 
 trigger:
   - none
@@ -26,4 +28,4 @@ stages:
           - template: ../../templates/connect-to-workspace.yml
           - template: ../../templates/register-aml-env.yml
             parameters:
-              environment_file: ../modules/train_env_specs.yml
+              environment_file: ${{ variables.environmentFile }}

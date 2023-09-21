@@ -6,8 +6,7 @@
 // prod and dev env
 
 // compute clusters and environments can be deployed as arm templates here as well.
-// However, I prefer to deploy them independently as you don't need resource group
-// permission to deploy them, only machine learning workspace level permissions.
+// However, as ml environments are bound to change more often, they are not deployed here
 
 targetScope = 'resourceGroup'
 param location string

@@ -1,0 +1,8 @@
+# specs for the compute cluster. See templates/create-compute.yml
+variables:
+  cluster_name: cpu-prod-cluster
+  cluster_size: Standard_DS3_v2
+  cluster_min_instances: 0
+  cluster_max_instances: 2
+  cluster_idle_seconds_before_scaledown: 1800
+  cluster_tier: dedicated

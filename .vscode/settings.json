@@ -3,5 +3,8 @@
         "."
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "files.associations": {
+        "**/.pipelines/**/pipelines/*.yml": "azure-pipelines"
+    }
 }

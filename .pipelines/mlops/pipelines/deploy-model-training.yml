@@ -1,0 +1,24 @@
+variables:
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'main' branch: PRD environment
+  #     - template: ../config-infra-prod.yml
+  # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'develop' or feature branches: DEV environment
+  #     - template: ../config-infra-dev.yml
+  - template: ../config-infra-prod.yml
+
+trigger:
+  - none
+
+pool:
+  vmImage: $(ap_vm_image)
+
+stages:
+  - stage: DeployTrainingPipeline
+    displayName: Deploy Training Pipeline
+    jobs:
+      - job: DeployTrainingPipeline
+        timeoutInMinutes: 120 # how long to run the job before automatically cancelling
+        steps:
+          - template: ../templates/intall-aml-cli.yml
+          - template: ../templates/connect-to-workspace.yml # we could also create env and compute here but i prefer to do it separately

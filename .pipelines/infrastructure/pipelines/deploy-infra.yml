@@ -1,13 +1,13 @@
 variables:
   # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
   #     # 'main' branch: PRD environment
-  #     - template: ../config-infra-prod.yml
+  #     - template: ../../config-infra-prod.yml
   # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
   #     # 'develop' or feature branches: DEV environment
-  #     - template: ../config-infra-dev.yml
-  - template: ../config-infra-prod.yml
+  #     - template: ../../config-infra-dev.yml
+  - template: ../../config-infra-prod.yml
   - name: bicepFile
-    value: "./infrastructure/main.bicep"
+    value: "$(Pipeline.Workspace)/.pipelines/infrastructure/main.bicep"
 
 trigger:
   - none
@@ -16,9 +16,16 @@ pool:
   vmImage: $(ap_vm_image)
 
 stages:
-  - template: ../templates/lint-bicep.yml
-    parameters:
-      bicepFile: $(bicepFile)
+  - stage: Lint
+    displayName: Lint and Preflight check
+    jobs:
+      - job: LintBicep
+        displayName: Lint Bicep Code
+        steps:
+          - checkout: self
+          - template: ../../templates/lint-bicep.yml
+            parameters:
+              bicepFile: $(bicepFile)
   - stage: PreflightValidation
     jobs:
       - job: ValidateBicepCode

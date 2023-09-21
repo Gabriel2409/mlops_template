@@ -1,0 +1,9 @@
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+name: mlops-tpl-train-env
+# check https://github.com/Azure/AzureML-Containers to see all microsoft images
+image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest # cpu image
+conda_file: ./train_env_conda_dependencies.yml
+description: >
+  Environment created from a Docker image plus Conda environment. Note that the
+  conda dependencies don't need to contain all the packages used in development. Only
+  the packages actually used for the training must be included.

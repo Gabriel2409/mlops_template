@@ -23,16 +23,13 @@ pool:
 stages:
   - stage: CreateDataAssets
     jobs:
-      - template: ../../templates/install-and-cache-python-requirements-jobs.yml
-        parameters:
-          pythonVersion: "3.10"
-          requirementsFilePath: requirements.txt
       - job: CreateDataAssets
         steps:
           - checkout: self
           - template: ../../templates/install-aml-cli.yml
           - template: ../../templates/connect-to-workspace.yml
           # todo: add unit test pipeline
+          - template: ../../templates/install-and-cache-python-requirements.yml
           - template: ../../templates/launch-kedro-azureml-pipeline.yml
             parameters:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}

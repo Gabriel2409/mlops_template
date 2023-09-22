@@ -38,7 +38,7 @@ stages:
               capture_pipeline_name: true
           - template: ../../templates/retrieve-kedro-job-name.yml
             parameters:
-              kedro_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)
+              parent_aml_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)
               job_display_name:  ${{ variables.model_node_name }}
           # - script: |
           #     if [ -z "$(LaunchKedroPipeline.CapturedAmlPipelineName)" ]; then

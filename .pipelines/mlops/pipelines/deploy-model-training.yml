@@ -40,11 +40,7 @@ stages:
             parameters:
               parent_aml_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)
               job_display_name:  ${{ variables.model_node_name }}
-          # - script: |
-          #     if [ -z "$(LaunchKedroPipeline.CapturedAmlPipelineName)" ]; then
-          #       echo "Error: CapturedAmlPipelineName is not defined."
-          #       exit 1  # Exit the script with an error code
-          #     else
-          #       echo "Captured Output from Launch Kedro Pipeline: $(LaunchKedroPipeline.CapturedAmlPipelineName)"
-          #     fi
-          #   displayName: 'Echo Captured CapturedAmlPipelineName'
+          - template: ../../templates/register-model.yml
+            parameters:
+              job_name: $(RetrieveJobName.CapturedJobName)
+              model_name: ${{ variables.kedro_pipeline_name }}

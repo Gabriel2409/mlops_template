@@ -1,0 +1,17 @@
+parameters:
+  - name: job_name
+    type: string
+  - name: model_name
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: Register Azure ML environment
+    # continueOnError: true
+    inputs:
+      azureSubscription: $(ado_service_connection_rg) #needs to have access at the RG level
+      scriptType: bash
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      scriptLocation: inlineScript
+      inlineScript: |
+        az ml model create --name ${{ parameters.model_name }}--path runs:/${{ parameters.job_name }}/model/ --type mlflow_model

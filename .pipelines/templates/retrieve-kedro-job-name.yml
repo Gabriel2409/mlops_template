@@ -20,7 +20,7 @@ steps:
             echo "Error: Parent pipeline not found"
             exit 1
           else
-            job_name=$(az ml job list -p ${{ parameters.parent_aml_pipeline_name }}  --query "[?contains(not_null(tags.node_names,''),'${{ job_display_name }}')]|[0].name" -o tsv)
+            job_name=$(az ml job list -p ${{ parameters.parent_aml_pipeline_name }}  --query "[?contains(not_null(tags.node_names,''),'${{ parameters.job_display_name }}')]|[0].name" -o tsv)
             if [ -z "$job_name" ]; then
               echo "Error: Job {{ parameters.job_display_name }} not found"
               exit 1

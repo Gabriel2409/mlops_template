@@ -11,8 +11,10 @@ variables:
   #     # 'develop' or feature branches: DEV environment
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
-  - name: kedro_pipeline_name
+  - name: kedro_pipeline_name # pipeline to launch to train the model
     value: dummy_classifier
+  - name: model_node_name # node where the model is stored as output
+    value: log_sklearn_scores
 
 trigger:
   - none
@@ -34,7 +36,15 @@ stages:
             parameters:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}
               capture_pipeline_name: true
-          - script: |
-              echo "Captured Output from Launch Kedro Pipeline: $(LaunchKedroPipeline.CapturedAmlPipelineName)"
-            displayName: 'Echo Captured CapturedAmlPipelineName'
-
+          - template: ../../templates/retrieve-kedro-job-name.yml
+            parameters:
+              kedro_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)
+              job_display_name:  ${{ variables.model_node_name }}
+          # - script: |
+          #     if [ -z "$(LaunchKedroPipeline.CapturedAmlPipelineName)" ]; then
+          #       echo "Error: CapturedAmlPipelineName is not defined."
+          #       exit 1  # Exit the script with an error code
+          #     else
+          #       echo "Captured Output from Launch Kedro Pipeline: $(LaunchKedroPipeline.CapturedAmlPipelineName)"
+          #     fi
+          #   displayName: 'Echo Captured CapturedAmlPipelineName'

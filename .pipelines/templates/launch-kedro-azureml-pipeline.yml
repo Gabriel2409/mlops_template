@@ -1,3 +1,6 @@
+# launches the kedro pipeline with kedro-azureml.
+# Optionally captures the pipeline name.
+
 parameters:
   - name: kedro_pipeline_name
     type: string

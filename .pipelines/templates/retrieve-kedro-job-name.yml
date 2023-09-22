@@ -1,0 +1,30 @@
+# retrieves a job from an azureml pipeline that was launched with kedro-azureml
+# by inspecting the tags of the nodes.
+parameters:
+  - name: parent_aml_pipeline_name
+    type: string
+  - name: job_display_name
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Retrieve Job Name"
+    name: RetrieveJobName
+    inputs:
+      azureSubscription: $(ado_service_connection_aml_ws)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        # kedro-azureml actually saves the list of node_names in a tag, we can use it to retrive the job
+          if [ -z "${{ parameters.parent_aml_pipeline_name}}" ]; then
+            echo "Error: Parent pipeline not found"
+            exit 1
+          else
+            job_name=$(az ml job list -p ${{ parameters.parent_aml_pipeline_name }}  --query "[?contains(not_null(tags.node_names,''),'${{ job_display_name }}')]|[0].name" -o tsv)
+            if [ -z "$job_name" ]; then
+              echo "Error: Job {{ parameters.job_display_name }} not found"
+              exit 1
+            else
+              echo "Found job: $job_name"
+            fi
+          fi

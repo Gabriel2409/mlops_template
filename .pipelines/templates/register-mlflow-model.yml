@@ -14,4 +14,4 @@ steps:
       workingDirectory: $(System.DefaultWorkingDirectory)
       scriptLocation: inlineScript
       inlineScript: |
-        az ml model create --name ${{ parameters.model_name }}--path runs:/${{ parameters.job_name }}/model/ --type mlflow_model
+        az ml model create --name ${{ parameters.model_name }} --path runs:/${{ parameters.job_name }}/model/ --type mlflow_model

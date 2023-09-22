@@ -6,7 +6,7 @@ parameters:
 
 steps:
   - task: AzureCLI@2
-    displayName: Register Azure ML environment
+    displayName: Register MLFlow Model
     # continueOnError: true
     inputs:
       azureSubscription: $(ado_service_connection_rg) #needs to have access at the RG level

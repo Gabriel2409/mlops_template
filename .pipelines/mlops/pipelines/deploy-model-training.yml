@@ -35,6 +35,6 @@ stages:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}
               capture_pipeline_name: true
           - script: |
-              echo "Captured Output from Launch Kedro Pipeline: $(CapturedAmlPipelineName)"
+              echo "Captured Output from Launch Kedro Pipeline: $(LaunchKedroPipeline.CapturedAmlPipelineName)"
             displayName: 'Echo Captured CapturedAmlPipelineName'
 

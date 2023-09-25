@@ -11,7 +11,7 @@ variables:
   - name: endpoint_type
     value: online
   - name: endpoint_file
-    value: ../online/online-endpoint.yml
+    value: ./.pipelines/mlops/online/online-endpoint.yml
 
 trigger:
   - none

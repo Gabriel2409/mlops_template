@@ -7,7 +7,7 @@ variables:
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
   - name: endpoint_name
-    value: mlops-classifier-$(namespace)$(postfix)$(environment)
+    value: mlopsclass-$(namespace)$(postfix)$(environment)
   - name: endpoint_type
     value: online
   - name: endpoint_file

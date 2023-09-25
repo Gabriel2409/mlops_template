@@ -31,6 +31,9 @@ stages:
           - template: ../../templates/create-endpoint.yml
             parameters:
               endpoint_file: ${{ variables.endpoint_file }}
+          - template: ../../templates/allocate-traffic.yml
+            parameters:
+              traffic_allocation: mlopsclass-online-dp=100
         # - template: templates/${{ variables.version }}/create-deployment.yml@mlops-templates
         #   parameters:
         #     deployment_name: taxi-online-dp

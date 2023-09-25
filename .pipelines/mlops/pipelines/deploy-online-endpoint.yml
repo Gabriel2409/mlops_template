@@ -12,6 +12,10 @@ variables:
     value: online
   - name: endpoint_file
     value: ./.pipelines/mlops/online/online-endpoint.yml
+  - name: deployment_name
+    value: mlopsclass-online-dp
+  - name: deployment_file
+    value: ./.pipelines/mlops/online/online-deployment.yml
 
 trigger:
   - none
@@ -31,9 +35,13 @@ stages:
           - template: ../../templates/create-endpoint.yml
             parameters:
               endpoint_file: ${{ variables.endpoint_file }}
+          - template: ../../templates/create-deployment.yml
+            parameters:
+              deployment_name: ${{ variables.deployment_name }}
+              deployment_file: ${{ variables.deployment_file }}
           - template: ../../templates/allocate-traffic.yml
             parameters:
-              traffic_allocation: mlopsclass-online-dp=100
+              traffic_allocation: ${{ variables.deployment_name }}=100
         # - template: templates/${{ variables.version }}/create-deployment.yml@mlops-templates
         #   parameters:
         #     deployment_name: taxi-online-dp

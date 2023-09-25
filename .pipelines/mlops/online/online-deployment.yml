@@ -1,0 +1,7 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+name: blue
+endpoint_name: mlops-classifier-online
+model: azureml:dummy_classifier@latest
+# instance_type: Standard_DS3_v2
+instance_type: Standard_DS2_v2
+instance_count: 1

@@ -5,8 +5,8 @@ variables:
   ap_vm_image: ubuntu-latest
 
   namespace: mlopstpl #Note: A namespace with many characters will cause storage account creation to fail due to storage account names having a limit of 24 characters.
-  postfix: 4876
-  location: westeurope
+  postfix: 4877
+  location: eastus
   environment: prod
 
 

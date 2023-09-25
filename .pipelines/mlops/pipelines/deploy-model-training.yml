@@ -41,8 +41,17 @@ stages:
           - template: ../../templates/retrieve-kedro-job-name.yml
             parameters:
               parent_aml_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)
-              job_display_name:  ${{ variables.model_node_name }}
+              job_display_name: ${{ variables.model_node_name }}
           - template: ../../templates/register-mlflow-model.yml
             parameters:
               job_name: $(RetrieveJobName.CapturedJobName)
               model_name: ${{ variables.model_name }}
+          - script: |
+              echo "Publishing asset name and version as artifacts..."
+              echo "${{ variables.model_name }}" > $(Build.ArtifactStagingDirectory)/model_name.txt
+              $model_version= $(az ml model list --name dummy_classifier  --query "[].{Version:version}" --output tsv | sort -r | head -n 1)
+              echo "$model_version" >> $(Build.ArtifactStagingDirectory)/model_version.txt
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)' # Publish the entire staging directory
+              artifact: 'model_info' # Give a name to your artifact

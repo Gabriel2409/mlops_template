@@ -13,6 +13,8 @@ variables:
   - template: ../../config-infra-prod.yml
   - name: kedro_pipeline_name # pipeline to launch to train the model
     value: dummy_classifier
+  - name: model_name # name to give to the output model
+    value: mlops_category_classifier
   - name: model_node_name # node where the model is stored as output
     value: log_sklearn_scores
 
@@ -43,4 +45,4 @@ stages:
           - template: ../../templates/register-mlflow-model.yml
             parameters:
               job_name: $(RetrieveJobName.CapturedJobName)
-              model_name: ${{ variables.kedro_pipeline_name }}
+              model_name: ${{ variables.model_name }}

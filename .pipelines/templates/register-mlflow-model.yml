@@ -1,3 +1,8 @@
+# registers the model if performances are satisfactory.
+# Note: you could compare it to previous performances here to decide whether to register
+# the model or not. One way would be to use the same test dataset and see the perf or
+# you could even use a most recent subset of data and compare perfs of old and new model
+
 parameters:
   - name: job_name
     type: string

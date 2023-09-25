@@ -12,7 +12,7 @@ variables:
   #     - template: ../../config-infra-dev.yml
   - template: ../../config-infra-prod.yml
   - name: kedro_pipeline_name # pipeline to launch to train the model
-    value: dummy_classifier
+    value: tfidf_sgd_classifier
   - name: model_name # name to give to the output model
     value: mlops_category_classifier
   - name: model_node_name # node where the model is stored as output

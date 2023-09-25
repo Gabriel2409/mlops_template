@@ -4,9 +4,9 @@ azure:
   # Azure ML Experiment Name
   experiment_name: "mlops_template"
   # Azure resource group to use
-  resource_group: "rg-mlopstpl-4876prod"
+  resource_group: "rg-mlopstpl-4877prod"
   # Azure ML Workspace name
-  workspace_name: "mlw-mlopstpl-4876prod"
+  workspace_name: "mlw-mlopstpl-4877prod"
   # Azure ML Environment to use during pipeline execution
   environment_name: mlops-tpl-train-env@latest
   # Path to directory to upload, or null to disable code upload

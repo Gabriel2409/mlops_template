@@ -5,14 +5,16 @@ resources:
       source: security-lib-ci
       trigger: true
 
-steps:
-  - download: current
-    artifact: MyBuildArtifact
+jobs:
+- job: DownloadAndDeploy
+  steps:
+  - task: DownloadBuildArtifacts@1
     displayName: "Download Build Artifact"
-    path: $(System.DefaultWorkingDirectory)
+    inputs:
+      buildType: 'current'
+      downloadPath: '$(System.DefaultWorkingDirectory)'
+      artifactName: 'MyBuildArtifact'
 
-  - script: echo "Performing deployment actions..."
-    displayName: "Deploy"
   - script: |
       echo "Contents of the downloaded sample.txt:"
       cat $(System.DefaultWorkingDirectory)/sample.txt

@@ -17,7 +17,7 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        kedro_command="kedro azureml run -p ${{ parameters.kedro_pipeline_name }} --wait-for-completion"
+        kedro_command="kedro azureml run -p ${{ parameters.kedro_pipeline_name }} --wait-for-completion --export-pipeline-name"
         if [ "${{ parameters.capture_pipeline_name }}" = false ]; then
             $kedro_command
         else

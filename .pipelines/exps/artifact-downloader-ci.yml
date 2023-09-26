@@ -18,7 +18,7 @@ jobs:
           buildType: specific
           project: mlops_template
           pipeline: artifact-creator
-          buildVersionToDownload: latest
+          specificBuildWithTriggering: true
           artifactName: MySampleArtifact
           downloadPath: $(System.DefaultWorkingDirectory)/myartifact
 

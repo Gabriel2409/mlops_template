@@ -1,24 +1,26 @@
 # app-ci YAML pipeline
 resources:
   pipelines:
-  - pipeline: artifactcreator  # Name of the pipeline resource.
-    source: artifact-creator  # The name of the pipeline referenced by this pipeline resource.
-    trigger: true  # Run app-ci pipeline when any run of security-lib-ci completes
+    - pipeline: artifactcreator # Name of the pipeline resource.
+      source: artifact-creator # The name of the pipeline referenced by this pipeline resource.
+      trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
+
+trigger: none
 
 jobs:
-- job: Build
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: DownloadBuildArtifacts@1
-    displayName: 'Download'
-    inputs:
-      buildType: 'specific'
-      pipeline: 'artifact-creator'  # Name of the source pipeline
-      buildVersionToDownload: 'latest'  # You can specify a specific build version if needed
-      artifactName: 'MySampleArtifact'  # The name of the artifact from the security-lib-ci pipeline
-      downloadPath: '$(System.DefaultWorkingDirectory)/myartifact'
+  - job: Build
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+      - task: DownloadBuildArtifacts@1
+        displayName: "Download"
+        inputs:
+          buildType: "specific"
+          pipeline: "artifact-creator" # Name of the source pipeline
+          buildVersionToDownload: "latest" # You can specify a specific build version if needed
+          artifactName: "MySampleArtifact" # The name of the artifact from the security-lib-ci pipeline
+          downloadPath: "$(System.DefaultWorkingDirectory)/myartifact"
 
-  - script: |
-      cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
-    displayName: 'Display Artifact Contents'
+      - script: |
+          cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
+        displayName: "Display Artifact Contents"

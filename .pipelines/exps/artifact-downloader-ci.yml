@@ -12,14 +12,14 @@ jobs:
     pool:
       vmImage: "ubuntu-latest"
     steps:
-      - task: DownloadBuildArtifacts@1
-        displayName: "Download"
-        inputs:
-          buildType: "current"
-          pipeline: "artifact-creator" # Name of the source pipeline
-          artifactName: "MySampleArtifact" # The name of the artifact from the security-lib-ci pipeline
-          downloadPath: "$(System.DefaultWorkingDirectory)/myartifact"
+      # - task: DownloadBuildArtifacts@1
+      #   displayName: "Download"
+      #   inputs:
+      #     buildType: "current"
+      #     pipeline: "artifact-creator" # Name of the source pipeline
+      #     artifactName: "MySampleArtifact" # The name of the artifact from the security-lib-ci pipeline
+      #     downloadPath: "$(System.DefaultWorkingDirectory)/myartifact"
 
       - script: |
-          cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
+          cat $(Build.ArtifactStagingDirectory)/sample.txt
         displayName: "Display Artifact Contents"

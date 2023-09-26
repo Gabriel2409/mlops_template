@@ -2,7 +2,7 @@
 resources:
   pipelines:
   - pipeline: artifactcreator  # Name of the pipeline resource.
-    source: sartifact-creator  # The name of the pipeline referenced by this pipeline resource.
+    source: artifact-creator  # The name of the pipeline referenced by this pipeline resource.
     trigger: true  # Run app-ci pipeline when any run of security-lib-ci completes
 
 jobs:

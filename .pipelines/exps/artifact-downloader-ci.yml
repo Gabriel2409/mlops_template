@@ -9,7 +9,7 @@ resources:
       trigger: true
 
 stages:
-  - stage: Get Artifact
+  - stage: GetArtifact
     jobs:
       - job: Build
         steps:

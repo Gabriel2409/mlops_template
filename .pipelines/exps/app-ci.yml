@@ -1,0 +1,20 @@
+# app-ci YAML pipeline
+resources:
+  pipelines:
+    - pipeline: securitylib
+      source: security-lib-ci
+      project: FabrikamProject
+      trigger: true
+
+steps:
+  - download: current
+    artifact: MyBuildArtifact
+    displayName: "Download Build Artifact"
+    path: $(System.DefaultWorkingDirectory)
+
+  - script: echo "Performing deployment actions..."
+    displayName: "Deploy"
+  - script: |
+      echo "Contents of the downloaded sample.txt:"
+      cat $(System.DefaultWorkingDirectory)/sample.txt
+    displayName: "Display Sample.txt Contents"

@@ -23,9 +23,9 @@ pip install -r requirements.txt
 #### Manual Deployment
 
 - you can manually deploy the azure infrastructure with
-  `az deployment group create --resource-group <myrg> --template-file infrastructure/main.bicep --parameters myfile.bicepparm`
+  `az deployment group create --resource-group <myrg> --template-file myfile.bicep --parameters myfile.bicepparm`
 
-`<myfile.bicepparam>` must include all the required parameters
+`myfile.bicepparam` must include all the required parameters
 
 #### Deployment with github actions (if repo is on github)
 
@@ -61,10 +61,26 @@ az ad sp create-for-rbac \
 
 ##### v2
 
-Since then I improved the deployment. Use `infrastructure/pipelines/deploy-infra.yml` instead, no need to add variables
-in azure devops. Instead, modify the `config-infra-prod.yml` file
+Since then I improved the deployment. All pipelines are in `.pipelines` folder
+All variables are in `config-infra-prod.yml`
 
-Note that this also deploys the compute cluster.
+```yml
+.pipelines/
+├── infrastructure # contains all code to deploy infrastructure
+│   ├── modules # all .bicep files
+│   ├── pipelines # contains pipeline to deploy infrastructure
+│   └── main.bicep # regroups all modules in one file
+├── mlops # contains code to run the mlops pipeline
+│   ├── modules # contains configs for mlops steps
+│   ├── online # online inference endpoint/deployment config
+│   └── pipelines # all pipelines (create env, compute, launch train...)
+├── templates # contains reusable pieces of code used in pipelines
+├── config-infra-prod.yml # contains variables for prod infra
+└── zz_old # old way to deploy, not used anymore
+    ├── aml_compute_clusters
+    ├── aml_environments
+    └── dev_resources
+```
 
 #### QoL post deployment
 
@@ -109,9 +125,13 @@ tier: dedicated
 
 Then run `az ml compute create --resource-group <rg> --workspace-name <ws> --file $script_dir/cluster_specs.yml`
 
-- To automate this, you can also create a pipeline from `infrastructure/aml_compute_clusters/create_dev_compute_cluster.yml`
 
-- NOTE: for v2, compute cluster is automatically created when deploying the infra
+#### v1
+- To automate this, you can also create a pipeline from `aml_compute_clusters/create_dev_compute_cluster.yml`
+
+#### v2
+-  compute cluster is automatically created when deploying the infra but you can also
+create a pipeline with `deploy-compute-cluster.yml`
 
 
 ### ML Environment
@@ -122,7 +142,6 @@ called prod. ml environments on the other hand, correspond to the image used for
 the training (usually a python image with conda dependencies but any docker image
 works). Because a given infra can have multiple environments, I did not add an arm
 template for the environment.
-
 
 - By default, azure comes with a lot of pre-configured environments that can be used as is.
 - It is also possible to create an environment from an image by adding conda dependencies.
@@ -180,11 +199,15 @@ env.register(workspace=ws)
 
 `az ml environment create --resource-group <rg> --workspace-name <ws> --image mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest --conda-file conda-dependencies.yaml --name <env_name>`
 
-
-- To automate this, you can also create a pipeline from `infrastructure/aml_environments/create_cpu_env.yaml`
-
-
 - TODO: Microsoft also has a list of prebuilt images for inference. It might be worth checking out
+
+#### v1
+
+- To automate this, you can also create a pipeline from `aml_environments/create_cpu_env.yaml`
+
+#### v2
+
+- Create a pipeline with `deploy-ml-env.yml`
 
 
 ## Create your project with kedro

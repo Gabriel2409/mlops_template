@@ -1,18 +1,24 @@
-# Pipeline 2: Triggered on Completion of Pipeline 1 - Use Artifacts
-trigger:
-- pipeline: artifact-creator  # Specify the name of the first pipeline
-  source: 'manual'      # Trigger when Pipeline 1 completes manually
+# app-ci YAML pipeline
+resources:
+  pipelines:
+  - pipeline: artifactcreator  # Name of the pipeline resource.
+    source: sartifact-creator  # The name of the pipeline referenced by this pipeline resource.
+    trigger: true  # Run app-ci pipeline when any run of security-lib-ci completes
 
-prerequisites:
-- job: DownloadAndUseArtifact
+jobs:
+- job: Build
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - download: current
-    artifact: MySampleArtifact  # Download the artifact from Pipeline 1
-    displayName: 'Download Artifact'
+  - task: DownloadBuildArtifacts@1
+    displayName: 'Download'
+    inputs:
+      buildType: 'specific'
+      pipeline: 'security-lib-ci'  # Name of the source pipeline
+      buildVersionToDownload: 'latest'  # You can specify a specific build version if needed
+      artifactName: 'MySampleArtifact'  # The name of the artifact from the security-lib-ci pipeline
+      downloadPath: '$(System.DefaultWorkingDirectory)/myartifact'
 
   - script: |
-      echo "Contents of the downloaded sample.txt:"
-      cat $(System.DefaultWorkingDirectory)/sample.txt
-    displayName: 'Display Sample.txt Contents'
+      cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
+    displayName: 'Display Artifact Contents'

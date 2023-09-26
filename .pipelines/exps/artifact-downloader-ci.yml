@@ -1,27 +1,28 @@
-# app-ci YAML pipeline
+trigger: none
+pool:
+  vmImage: "ubuntu-latest"
+
 resources:
   pipelines:
     - pipeline: artifact-creator
       source: artifact-creator
       trigger: true
 
-trigger: none
+stages:
+  - stage: Get Artifact
+    jobs:
+      - job: Build
+        steps:
+          - task: DownloadBuildArtifacts@1
+            displayName: "Download Artifact"
+            inputs:
+              buildType: specific
+              project: mlops_template
+              pipeline: artifact-creator
+              specificBuildWithTriggering: true
+              artifactName: MyBuildArtifact
+              downloadPath: $(System.DefaultWorkingDirectory)/myartifact
 
-jobs:
-  - job: Build
-    pool:
-      vmImage: "ubuntu-latest"
-    steps:
-      - task: DownloadBuildArtifacts@1
-        displayName: "Download"
-        inputs:
-          buildType: specific
-          project: mlops_template
-          pipeline: artifact-creator
-          specificBuildWithTriggering: true
-          artifactName: MyBuildArtifact
-          downloadPath: $(System.DefaultWorkingDirectory)/myartifact
-
-      - script: |
-          cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
-        displayName: "Display Artifact Contents"
+          - script: |
+              cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
+            displayName: "Display Artifact Contents"

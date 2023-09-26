@@ -1,0 +1,15 @@
+# Pipeline 1: Manual Trigger - Publish Artifact
+trigger: none  # Manual trigger
+
+prerequisites:
+- job: PublishArtifact
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo "Creating sample.txt..."
+      echo "This is a sample text file." > sample.txt
+    displayName: 'Create sample.txt'
+
+  - publish: $(System.DefaultWorkingDirectory)
+    artifact: MySampleArtifact  # Publish the sampl

@@ -1,0 +1,18 @@
+# Pipeline 2: Triggered on Completion of Pipeline 1 - Use Artifacts
+trigger:
+- pipeline: artifact-creator  # Specify the name of the first pipeline
+  source: 'manual'      # Trigger when Pipeline 1 completes manually
+
+prerequisites:
+- job: DownloadAndUseArtifact
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - download: current
+    artifact: MySampleArtifact  # Download the artifact from Pipeline 1
+    displayName: 'Download Artifact'
+
+  - script: |
+      echo "Contents of the downloaded sample.txt:"
+      cat $(System.DefaultWorkingDirectory)/sample.txt
+    displayName: 'Display Sample.txt Contents'

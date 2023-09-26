@@ -23,5 +23,5 @@ jobs:
           downloadPath: $(System.DefaultWorkingDirectory)/myartifact
 
       - script: |
-          cat $(System.DefaultWorkingDirectory)/sample.txt
+          cat $(System.DefaultWorkingDirectory)/myartifact/sample.txt
         displayName: "Display Artifact Contents"

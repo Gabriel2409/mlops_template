@@ -1,12 +1,19 @@
-steps:
-- script: echo "Performing build actions..."
-  displayName: 'Build'
-  # Add your build steps here
+trigger:
+  - none
 
-- script: |
-    # Create or copy the sample.txt file to the desired location
-    echo "This is a sample file." > $(Build.ArtifactStagingDirectory)/sample.txt
-  displayName: 'Create sample.txt'
+stages:
+  - stage: Security
+    jobs:
+      - job: SecurityJob
+        steps:
+          - script: echo "Performing build actions..."
+            displayName: "Build"
+            # Add your build steps here
 
-- publish: $(Build.ArtifactStagingDirectory)
-  artifact: MyBuildArtifact
+          - script: |
+              # Create or copy the sample.txt file to the desired location
+              echo "This is a sample file." > $(Build.ArtifactStagingDirectory)/sample.txt
+            displayName: "Create sample.txt"
+
+          - publish: $(Build.ArtifactStagingDirectory)
+            artifact: MyBuildArtifact

@@ -1,9 +1,9 @@
 # app-ci YAML pipeline
 resources:
   pipelines:
-    - pipeline: artifact-creator # Name of the pipeline resource.
-      source: artifact-creator # The name of the pipeline referenced by this pipeline resource.
-      trigger: true # Run app-ci pipeline when any run of security-lib-ci completes
+    - pipeline: artifact-creator
+      source: artifact-creator
+      trigger: true
 
 trigger: none
 
@@ -19,7 +19,7 @@ jobs:
           project: mlops_template
           pipeline: artifact-creator
           specificBuildWithTriggering: true
-          artifactName: MySampleArtifact
+          artifactName: MyBuildArtifact
           downloadPath: $(System.DefaultWorkingDirectory)/myartifact
 
       - script: |

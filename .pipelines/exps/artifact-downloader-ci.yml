@@ -15,9 +15,8 @@ jobs:
       - task: DownloadBuildArtifacts@1
         displayName: "Download"
         inputs:
-          buildType: "specific"
+          buildType: "current"
           pipeline: "artifact-creator" # Name of the source pipeline
-          buildVersionToDownload: "latest" # You can specify a specific build version if needed
           artifactName: "MySampleArtifact" # The name of the artifact from the security-lib-ci pipeline
           downloadPath: "$(System.DefaultWorkingDirectory)/myartifact"
 

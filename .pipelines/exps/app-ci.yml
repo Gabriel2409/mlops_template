@@ -13,7 +13,7 @@ jobs:
     inputs:
       buildType: 'current'
       downloadPath: '$(System.DefaultWorkingDirectory)'
-      artifactName: 'MyBuildArtifact'
+      artifactName: MyBuildArtifact
 
   - script: |
       echo "Contents of the downloaded sample.txt:"

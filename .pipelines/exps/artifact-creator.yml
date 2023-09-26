@@ -9,8 +9,11 @@ stages:
         steps:
           - script: |
               echo "Creating sample.txt..."
-              echo "This is a sample text file." > sample.txt
+              echo "This is a sample text file." > $(Build.ArtifactStagingDirectory)/sample.txt
             displayName: "Create sample.txt"
 
-          - publish: $(System.DefaultWorkingDirectory)
-        artifact: MySampleArtifact # Publish the sample
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)" # Publish the entire staging directory
+              artifact: "MyBuildArtifact" # Give a name to your artifact
+            displayName: Push artifacts from Build.ArtifactStagingDirectory

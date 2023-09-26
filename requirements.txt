@@ -9,7 +9,8 @@ jupyter
 jupyterlab
 jupyterlab_server
 kedro~=0.18.12
-kedro-azureml # experimental
+# kedro-azureml # experimental
+--find-links "https://stmlopstpl4877prod.blob.core.windows.net/testimages/kedro_azureml-0.6.0.tar.gz?sp=r&st=2023-09-26T07:32:49Z&se=2023-09-26T15:32:49Z&spr=https&sv=2022-11-02&sr=b&sig=keOI%2FP8eMMBUoQtN%2BmflNjYrYmGkZHTjCMhLxpTl7rs%3D" kedro-azureml
 kedro-docker~=0.3.1
 kedro-mlflow~=0.11.9
 kedro-viz~=6.3.4

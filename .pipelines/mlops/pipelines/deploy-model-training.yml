@@ -39,11 +39,12 @@ stages:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}
               capture_pipeline_name: true
 
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Text File as Artifact'
-            inputs:
-              PathtoPublish: $(System.DefaultWorkingDirectory)/kedro_azureml_pipeline_infos.txt
-              ArtifactName: 'MyPipelineInfos'
+          # just for testing, ideally we have a better option to retrieve the job name
+          # - task: PublishBuildArtifacts@1
+          #   displayName: 'Publish Text File as Artifact'
+          #   inputs:
+          #     PathtoPublish: $(System.DefaultWorkingDirectory)/kedro_azureml_pipeline_infos.txt
+          #     ArtifactName: 'MyPipelineInfos'
 
           - template: ../../templates/retrieve-kedro-job-name.yml
             parameters:
@@ -58,7 +59,9 @@ stages:
               echo "${{ variables.model_name }}" > $(Build.ArtifactStagingDirectory)/model_name.txt
               $model_version= $(az ml model list --name dummy_classifier  --query "[].{Version:version}" --output tsv | sort -r | head -n 1)
               echo "$model_version" >> $(Build.ArtifactStagingDirectory)/model_version.txt
+            displayName: Push artifacts to Build.ArtifactStagingDirectory
           - task: PublishPipelineArtifact@1
             inputs:
               targetPath: '$(Build.ArtifactStagingDirectory)' # Publish the entire staging directory
               artifact: 'model_info' # Give a name to your artifact
+            displayName: Push artifacts from Build.ArtifactStagingDirectory

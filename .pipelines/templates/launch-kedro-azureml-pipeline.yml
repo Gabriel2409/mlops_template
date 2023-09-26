@@ -17,10 +17,13 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        kedro_command="kedro azureml run -p ${{ parameters.kedro_pipeline_name }} --wait-for-completion  --export-pipeline-infos"
+        kedro_command="kedro azureml run -p ${{ parameters.kedro_pipeline_name }}"
+        kedro_command+=" --wait-for-completion"
+        # kedro_command+=" --export-pipeline-infos"
         if [ "${{ parameters.capture_pipeline_name }}" = false ]; then
             $kedro_command
         else
+          set -e # fail on error
           # display output line by line in real time and captures it
           while IFS= read -r line; do
             echo "$line"  # Display the output in real-time

@@ -9,8 +9,8 @@ jupyter
 jupyterlab
 jupyterlab_server
 kedro~=0.18.12
-# kedro-azureml # experimental
-git+https://github.com/Gabriel2409/kedro-azureml.git@feature/export-job-name-for-cicd
+kedro-azureml
+# git+https://github.com/Gabriel2409/kedro-azureml.git@feature/export-job-name-for-cicd
 kedro-docker~=0.3.1
 kedro-mlflow~=0.11.9
 kedro-viz~=6.3.4

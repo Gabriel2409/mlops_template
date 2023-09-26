@@ -1,7 +1,8 @@
 trigger: none # Manual trigger
 
-steps:
-  - jobs:
+stages:
+  - stage: Publish
+    jobs:
       - job: PublishArtifact
         pool:
           vmImage: "ubuntu-latest"

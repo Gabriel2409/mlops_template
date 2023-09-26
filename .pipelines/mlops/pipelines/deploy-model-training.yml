@@ -38,6 +38,13 @@ stages:
             parameters:
               kedro_pipeline_name: ${{ variables.kedro_pipeline_name }}
               capture_pipeline_name: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Text File as Artifact'
+            inputs:
+              PathtoPublish: $(System.DefaultWorkingDirectory)/kedro_azureml_pipeline_infos.txt
+              ArtifactName: 'MyPipelineInfos'
+
           - template: ../../templates/retrieve-kedro-job-name.yml
             parameters:
               parent_aml_pipeline_name: $(LaunchKedroPipeline.CapturedAmlPipelineName)

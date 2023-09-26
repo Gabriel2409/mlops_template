@@ -3,7 +3,6 @@ resources:
   pipelines:
     - pipeline: securitylib
       source: security-lib-ci
-      project: FabrikamProject
       trigger: true
 
 steps:

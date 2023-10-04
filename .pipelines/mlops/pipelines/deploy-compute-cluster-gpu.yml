@@ -1,0 +1,37 @@
+# no need to run this pipeline if the infra was correctly deployed.
+# This only allows to create/recreate the cluster without launching the whole infra
+# pipeline when needed. This only works if the workspace is already deployed
+
+variables:
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'main' branch: PRD environment
+  #     - template: ../../config-infra-prod.yml
+  # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'develop' or feature branches: DEV environment
+  #     - template: ../../config-infra-dev.yml
+  - template: ../../config-infra-prod.yml
+  - template: ../modules/compute_cluster_gpu_specs.yml
+
+trigger:
+  - none
+
+pool:
+  vmImage: $(ap_vm_image)
+
+stages:
+  - stage: DeployGpuComputeCluster
+    displayName: Deploy GPU Compute Cluster
+    jobs:
+      - job: DeployGpuComputeCluster
+        steps:
+          - checkout: self
+          - template: ../../templates/install-aml-cli.yml
+          - template: ../../templates/connect-to-workspace.yml
+          - template: ../../templates/create-compute.yml
+            parameters:
+              cluster_name: ${{ variables.cluster_name }}
+              cluster_size: ${{ variables.cluster_size }}
+              cluster_min_instances: ${{ variables.cluster_min_instances }}
+              cluster_max_instances: ${{ variables.cluster_max_instances }}
+              cluster_idle_seconds_before_scaledown: ${{ variables.cluster_idle_seconds_before_scaledown }}
+              cluster_tier: ${{ variables.cluster_tier }}

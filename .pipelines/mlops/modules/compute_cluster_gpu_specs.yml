@@ -1,0 +1,8 @@
+# specs for the gpu compute cluster. See templates/create-compute.yml
+variables:
+  cluster_name: gpu-cluster
+  cluster_size: Standard_NC4as_T4_v3
+  cluster_min_instances: 0
+  cluster_max_instances: 2
+  cluster_idle_seconds_before_scaledown: 300
+  cluster_tier: dedicated

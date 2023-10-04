@@ -103,3 +103,14 @@ module mlwcc './modules/aml_cpu_computecluster.bicep' = {
     aml_workspace: aml_workspace
   }
 }
+
+module mlwgpu './modules/aml_gpu_computecluster.bicep' = {
+  name: 'mlwgpu'
+  dependsOn: [ mlw ]
+  scope: resourceGroup(resource_group)
+  params: {
+    location: location
+    name: 'gpu-cluster'
+    aml_workspace: aml_workspace
+  }
+}

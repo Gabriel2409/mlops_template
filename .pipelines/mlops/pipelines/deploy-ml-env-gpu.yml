@@ -1,0 +1,31 @@
+# Run after creating the infrastructure
+
+variables:
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'main' branch: PRD environment
+  #     - template: ../../config-infra-prod.yml
+  # - ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+  #     # 'develop' or feature branches: DEV environment
+  #     - template: ../../config-infra-dev.yml
+  - template: ../../config-infra-prod.yml
+  - name: environmentFile
+    value: ./.pipelines/mlops/modules/train_env_gpu_specs.yml
+
+trigger:
+  - none
+
+pool:
+  vmImage: $(ap_vm_image)
+
+stages:
+  - stage: RegisterAmlEnv
+    displayName: Register Aml Env
+    jobs:
+      - job: RegisterAmlEnv
+        steps:
+          - checkout: self
+          - template: ../../templates/install-aml-cli.yml
+          - template: ../../templates/connect-to-workspace.yml
+          - template: ../../templates/register-aml-env.yml
+            parameters:
+              environment_file: ${{ variables.environmentFile }}

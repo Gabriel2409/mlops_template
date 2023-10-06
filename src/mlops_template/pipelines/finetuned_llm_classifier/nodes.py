@@ -18,126 +18,6 @@ from transformers import BertModel, BertTokenizer
 from .stopwords import STOPWORDS
 
 
-def clean_text(text: str, stopwords: list[str] = STOPWORDS) -> str:
-    """Clean raw text string.
-
-    Args:
-        text (str): Raw text to clean.
-        stopwords (List, optional): list of words to filter out. Defaults to STOPWORDS.
-
-    Returns:
-        str: cleaned text.
-    """
-    # Lower
-    text = text.lower()
-
-    # Remove stopwords
-    pattern = re.compile(r"\b(" + r"|".join(stopwords) + r")\b\s*")
-    text = pattern.sub(" ", text)
-
-    # Spacing and filters
-    text = re.sub(
-        r"([!\"'#$%&()*\+,-./:;<=>?@\\\[\]^_`{|}~])", r" \1 ", text
-    )  # add spacing
-    text = re.sub("[^A-Za-z0-9]+", " ", text)  # remove non alphanumeric chars
-    text = re.sub(" +", " ", text)  # remove multiple spaces
-    text = text.strip()  # strip white space at the ends
-    text = re.sub(r"http\S+", "", text)  # remove links
-
-    return text
-
-
-def tokenize(batch: pd.DataFrame) -> dict:
-    """Tokenize the text input in our batch using a tokenizer.
-
-    Args:
-        batch (Dict): batch of data with the text inputs to tokenize.
-
-    Returns:
-        Dict: batch of data with the results of tokenization (`input_ids` and `attention_mask`) on the text inputs.
-    """
-    tokenizer = BertTokenizer.from_pretrained(
-        "allenai/scibert_scivocab_uncased", return_dict=False
-    )
-    encoded_inputs = tokenizer(
-        batch["text"].tolist(), return_tensors="np", padding="longest"
-    )
-    return dict(
-        ids=encoded_inputs["input_ids"],
-        masks=encoded_inputs["attention_mask"],
-        targets=np.array(batch["tag"]),
-    )
-
-
-def preprocess(df: pd.DataFrame) -> dict:
-    """Preprocess the data in our dataframe.
-
-    Args:
-        df (pd.DataFrame): Raw dataframe to preprocess.
-
-    Returns:
-        Dict: preprocessed data (ids, masks, targets).
-    """
-
-    df = df.copy()
-    df["text"] = df["title"] + " " + df["description"]
-    df["text"] = df["text"].apply(clean_text)
-    outputs = tokenize(df)
-    return outputs
-
-
-def get_device():
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    else:
-        return torch.device("cpu")
-
-
-def pad_array(arr, dtype=np.int32):
-    """
-    Pad a 2D NumPy array with zeros to make all rows have the same length.
-
-    Parameters:
-    - `arr` (numpy.ndarray): The input 2D array to be padded.
-    - `dtype` (numpy.dtype, optional): The data type of the resulting padded array.
-      Defaults to np.int32.
-
-    Returns:
-    - `padded_arr` (numpy.ndarray): A new 2D array with the same number of rows as `arr`,
-      where each row is padded with zeros to match the length of the longest row.
-
-    Example:
-    >>> import numpy as np
-    >>> arr = np.array([[1, 2, 3], [4, 5], [6, 7, 8, 9]])
-    >>> padded_arr = pad_array(arr)
-    >>> print(padded_arr)
-    array([[1, 2, 3, 0],
-           [4, 5, 0, 0],
-           [6, 7, 8, 9]], dtype=int32)
-
-    This function takes a 2D array `arr` and pads each row with zeros to match the length
-    of the longest row in the input. The resulting padded array `padded_arr` is returned
-    with the specified data type or the default data type np.int32.
-    """
-    max_len = max(len(row) for row in arr)
-    padded_arr = np.zeros((arr.shape[0], max_len), dtype=dtype)
-    for i, row in enumerate(arr):
-        padded_arr[i][: len(row)] = row
-    return padded_arr
-
-
-def collate_fn(batch):
-    batch["ids"] = pad_array(batch["ids"])
-    batch["masks"] = pad_array(batch["masks"])
-    dtypes = {"ids": torch.int32, "masks": torch.int32, "targets": torch.int64}
-    tensor_batch = {}
-    for key, array in batch.items():
-        tensor_batch[key] = torch.as_tensor(
-            array, dtype=dtypes[key], device=get_device()
-        )
-    return tensor_batch
-
-
 class TokenizedDataset(Dataset):
     def __init__(self, df: pd.DataFrame):
         self.df = df
@@ -148,10 +28,56 @@ class TokenizedDataset(Dataset):
     def __len__(self):
         return len(self.df)
 
+    def clean_text(self, text: str, stopwords: list[str] = STOPWORDS) -> str:
+        """Clean raw text string.
+        Args:
+            text (str): Raw text to clean.
+            stopwords (List, optional): list of words to filter out.
+            Defaults to STOPWORDS.
+
+        Returns:
+            str: cleaned text.
+        """
+        # Lower
+        text = text.lower()
+
+        # Remove stopwords
+        pattern = re.compile(r"\b(" + r"|".join(stopwords) + r")\b\s*")
+        text = pattern.sub(" ", text)
+
+        # Spacing and filters
+        text = re.sub(
+            r"([!\"'#$%&()*\+,-./:;<=>?@\\\[\]^_`{|}~])", r" \1 ", text
+        )  # add spacing
+        text = re.sub("[^A-Za-z0-9]+", " ", text)  # remove non alphanumeric chars
+        text = re.sub(" +", " ", text)  # remove multiple spaces
+        text = text.strip()  # strip white space at the ends
+        text = re.sub(r"http\S+", "", text)  # remove links
+
+        return text
+
+    def tokenize_text(self, text: str) -> dict[str, torch.Tensor]:
+        # Tokenize the text using the tokenizer
+        inputs = self.tokenizer(
+            text,
+            return_tensors="np",  # Return PyTorch tensors
+            padding="longest",  # Padding to the longest sequence in the batch
+            truncation=True,  # Truncate sequences if they exceed max length
+        )
+
+        return inputs
+
     def __getitem__(self, idx):
-        # You can customize this method to return data in the desired format
-        sample = self.df.iloc[idx]
-        return sample
+        row = self.df.iloc[idx]
+        text: str = row["title"] + " " + row["description"]
+        text = self.clean_text(text)
+        tokenized_text = self.tokenize_text(text)
+        target = torch.tensor(row["tag"], dtype=torch.int32)  # Convert target to tensor
+        return {
+            "input_ids": tokenized_text["input_ids"].flatten(),  # 1d
+            "attention_masks": tokenized_text["attention_mask"].flatten(),  # 1d
+            "targets": target,  # scalar
+        }
 
 
 class TokenizedDataModule(L.LightningDataModule):
@@ -177,30 +103,52 @@ class TokenizedDataModule(L.LightningDataModule):
             self.train_val_df, test_size=self.val_proportion
         )
 
-        self.train_outputs = preprocess(self.train_df)
-        self.val_outputs = preprocess(self.val_df)
-        self.test_outputs = preprocess(self.test_df)
+        self.train_dataset = TokenizedDataset(self.train_df)
+        self.val_dataset = TokenizedDataset(self.val_df)
+        self.test_dataset = TokenizedDataset(self.test_df)
 
-        self.train_dataset = MyDataset(self.train_outputs)
-        self.val_dataset = MyDataset(self.val_outputs)
-        self.test_dataset = MyDataset(self.test_outputs)
+    def pad_array(self, arr, dtype=np.int32):
+        max_len = max(len(row) for row in arr)
+        padded_arr = np.zeros((len(arr), max_len), dtype=dtype)
+        for i, row in enumerate(arr):
+            padded_arr[i][: len(row)] = row
+        return padded_arr
+
+    def collate_fn(self, batch):
+        input_ids = [item["input_ids"] for item in batch]
+        attention_masks = [item["attention_masks"] for item in batch]
+        targets = [item["targets"] for item in batch]
+
+        padded_ids = self.pad_array(input_ids)
+        padded_masks = self.pad_array(attention_masks)
+        targets = torch.stack(targets)
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        tensor_batch = {}
+        for key, array in [
+            ("input_ids", padded_ids),
+            ("attention_mask", padded_masks),
+            ("targets", targets),
+        ]:
+            tensor_batch[key] = torch.as_tensor(array, dtype=torch.int32, device=device)
+        return tensor_batch
 
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
-            collate_fn=collate_fn,
+            collate_fn=self.collate_fn,
         )
 
     def val_dataloader(self):
         return DataLoader(
-            self.val_dataset, batch_size=self.batch_size, collate_fn=collate_fn
+            self.val_dataset, batch_size=self.batch_size, collate_fn=self.collate_fn
         )
 
     def test_dataloader(self):
         return DataLoader(
-            self.test_dataset, batch_size=self.batch_size, collate_fn=collate_fn
+            self.test_dataset, batch_size=self.batch_size, collate_fn=self.collate_fn
         )
 
 
@@ -286,3 +234,15 @@ class FinetunedLlmModule(L.LightningModule):
             "lr_scheduler": scheduler,
             "monitor": "val_loss",
         }
+
+
+# df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv")
+# test_df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/holdout.csv")
+
+# df["tag"] = 0
+# test_df["tag"] = 2
+# bs = 2
+# dm = TokenizedDataModule(df, test_df, batch_size=bs)
+# dm.setup()
+# iterator = iter(dm.train_dataloader())
+# next(iterator)

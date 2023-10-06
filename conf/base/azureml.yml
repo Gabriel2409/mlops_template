@@ -35,6 +35,8 @@ azure:
     # __default__ cluster.
     __default__:
       cluster_name: "cpu-cluster"
+    gpu:
+      cluster_name: "gpu-cluster"
     # <your_node_tag>:
     #   cluster_name: "<your_cluster_name>"
 docker:

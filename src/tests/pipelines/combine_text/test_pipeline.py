@@ -12,7 +12,11 @@ import pandas as pd
 import pytest
 from kedro.pipeline import Pipeline
 
-from mlops_template.pipelines.combine_text.pipeline import combine_title_and_desc, create_pipeline
+from mlops_template.pipelines.combine_text.pipeline import (
+    combine_title_and_desc,
+    create_pipeline,
+)
+
 
 @pytest.fixture
 def sample_data():

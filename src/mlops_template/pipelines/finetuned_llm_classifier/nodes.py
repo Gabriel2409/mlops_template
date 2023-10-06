@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
+from lightning.pytorch.callbacks import ProgressBar
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertModel, BertTokenizer
@@ -72,7 +73,7 @@ class TokenizedDataset(Dataset):
         text: str = row["title"] + " " + row["description"]
         text = self.clean_text(text)
         tokenized_text = self.tokenize_text(text)
-        target = torch.tensor(row["tag"], dtype=torch.int32)  # Convert target to tensor
+        target = torch.tensor(row["tag"], dtype=torch.int64)  # Convert target to tensor
         return {
             "input_ids": tokenized_text["input_ids"].flatten(),  # 1d
             "attention_masks": tokenized_text["attention_mask"].flatten(),  # 1d
@@ -87,20 +88,18 @@ class TokenizedDataModule(L.LightningDataModule):
         test_df,
         val_proportion=0.2,
         batch_size=32,
-        feature_col="text",
-        target_col="tag",
     ):
         super().__init__()
         self.train_val_df = train_val_df
         self.test_df = test_df
         self.val_proportion = val_proportion
         self.batch_size = batch_size
-        self.feature_col = feature_col
-        self.target_col = target_col
 
     def setup(self, stage=None):
         self.train_df, self.val_df = train_test_split(
-            self.train_val_df, test_size=self.val_proportion
+            self.train_val_df,
+            test_size=self.val_proportion,
+            stratify=self.train_val_df["tag"],
         )
 
         self.train_dataset = TokenizedDataset(self.train_df)
@@ -125,12 +124,12 @@ class TokenizedDataModule(L.LightningDataModule):
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         tensor_batch = {}
-        for key, array in [
-            ("input_ids", padded_ids),
-            ("attention_mask", padded_masks),
-            ("targets", targets),
+        for key, array, dtype in [
+            ("input_ids", padded_ids, torch.int32),
+            ("attention_mask", padded_masks, torch.int32),
+            ("targets", targets, torch.int64),
         ]:
-            tensor_batch[key] = torch.as_tensor(array, dtype=torch.int32, device=device)
+            tensor_batch[key] = torch.as_tensor(array, dtype=dtype, device=device)
         return tensor_batch
 
     def train_dataloader(self):
@@ -181,13 +180,17 @@ class FinetunedLlmModule(L.LightningModule):
 
         self.loss_fn = nn.BCEWithLogitsLoss()
 
-        self.accuracy = torchmetrics.Accuracy(task="multiclass")
+        self.accuracy = torchmetrics.Accuracy(
+            task="multiclass", num_classes=self.num_classes
+        )
         self.f1_macro = torchmetrics.F1Score(
             task="multiclass", num_classes=self.num_classes, average="macro"
         )
 
     def forward(self, batch):
-        seq, pool = self.llm(input_ids=batch["ids"], attention_mask=batch["masks"])
+        seq, pool = self.llm(
+            input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]
+        )
         z = self.dropout(pool)
         z = self.fc1(z)
         return z
@@ -234,6 +237,42 @@ class FinetunedLlmModule(L.LightningModule):
             "lr_scheduler": scheduler,
             "monitor": "val_loss",
         }
+
+
+def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
+    num_classes = len(label_encoder_mapping)
+    batch_size = int(config["batch_size"])
+    dropout_p = float(config["dropout_p"])
+    lr = float(config["lr"])
+    lr_factor = float(config["lr_factor"])
+    lr_patience = int(config["lr_patience"])
+    num_epochs = int(config["num_epochs"])
+
+    datamodule = TokenizedDataModule(
+        train_val_df=train_val_df,
+        test_df=test_df,
+        val_proportion=0.2,
+        batch_size=config["batch_size"],
+    )
+
+    model = FinetunedLlmModule(
+        num_classes=num_classes,
+        dropout_p=dropout_p,
+        lr=lr,
+        lr_factor=lr_factor,
+        lr_patience=lr_patience,
+        num_epochs=num_epochs,
+        batch_size=batch_size,
+    )
+
+    trainer = L.Trainer(
+        max_epochs=num_epochs,
+        logger=True,
+        callbacks=[ProgressBar()],
+        log_every_n_steps=5,
+    )
+    trainer.fit(model, datamodule)
+    return model
 
 
 # df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv")

@@ -61,6 +61,10 @@ sklearn_classifier_mlflow:
   type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
   flavor: mlflow.sklearn
 
+pytorch_classifier_mlflow:
+  type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+  flavor: mlflow.pytorch
+
 optuna_best_params_mlflow:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
   data_set:

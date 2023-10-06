@@ -162,3 +162,6 @@ venv.bak/
 #mlflow
 mlruns
 mlflow_artifacts/
+
+#lightning
+lightning_logs/

@@ -165,3 +165,4 @@ mlflow_artifacts/
 
 #lightning
 lightning_logs/
+llm_checkpoints/

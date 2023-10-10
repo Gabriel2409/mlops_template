@@ -2,21 +2,25 @@
 This is a boilerplate pipeline 'finetuned_llm_classifier'
 generated using Kedro 0.18.13
 """
+import logging
 import re
 
 import lightning as L
+import mlflow
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
-from lightning.pytorch.callbacks import ProgressBar
+from lightning.pytorch.loggers import MLFlowLogger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertModel, BertTokenizer
 
 from .stopwords import STOPWORDS
+
+log = logging.getLogger(__name__)
 
 
 class TokenizedDataset(Dataset):
@@ -159,7 +163,6 @@ class FinetunedLlmModule(L.LightningModule):
         lr: float = 1e-4,
         lr_factor: float = 0.8,
         lr_patience: int = 3,
-        num_epochs: int = 10,
         batch_size: int = 32,
     ):
         super().__init__()
@@ -168,7 +171,6 @@ class FinetunedLlmModule(L.LightningModule):
         self.lr = lr
         self.lr_factor = lr_factor
         self.lr_patience = lr_patience
-        self.num_epochs = num_epochs
         self.batch_size = batch_size
         self.llm = BertModel.from_pretrained(
             "allenai/scibert_scivocab_uncased", return_dict=False
@@ -247,6 +249,8 @@ def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
     lr_factor = float(config["lr_factor"])
     lr_patience = int(config["lr_patience"])
     num_epochs = int(config["num_epochs"])
+    checkpoint_dir = config["checkpoint_dir"]
+    resume_checkpoint_from = config["resume_checkpoint_from"]
 
     datamodule = TokenizedDataModule(
         train_val_df=train_val_df,
@@ -255,28 +259,49 @@ def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
         batch_size=config["batch_size"],
     )
 
-    model = FinetunedLlmModule(
-        num_classes=num_classes,
-        dropout_p=dropout_p,
-        lr=lr,
-        lr_factor=lr_factor,
-        lr_patience=lr_patience,
-        num_epochs=num_epochs,
-        batch_size=batch_size,
+    if resume_checkpoint_from:
+        model = FinetunedLlmModule.load_from_checkpoint(
+            resume_checkpoint_from,
+            num_classes=num_classes,
+            dropout_p=dropout_p,
+            lr=lr,
+            lr_factor=lr_factor,
+            lr_patience=lr_patience,
+            batch_size=batch_size,
+        )
+
+    else:
+        model = FinetunedLlmModule(
+            num_classes=num_classes,
+            dropout_p=dropout_p,
+            lr=lr,
+            lr_factor=lr_factor,
+            lr_patience=lr_patience,
+            batch_size=batch_size,
+        )
+
+    mlflow_tracking_uri = mlflow.get_tracking_uri()
+    run_id = mlflow.active_run().info.run_id
+
+    mlflow_logger = MLFlowLogger(
+        run_id=run_id,
+        tracking_uri=mlflow_tracking_uri,
     )
 
     trainer = L.Trainer(
+        default_root_dir=checkpoint_dir,
+        enable_progress_bar=True,
         max_epochs=num_epochs,
-        logger=True,
-        callbacks=[ProgressBar()],
+        logger=mlflow_logger,
+        # callbacks=[ProgressBar()],
         log_every_n_steps=5,
     )
     trainer.fit(model, datamodule)
     return model
 
 
-# df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv")
-# test_df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/holdout.csv")
+# df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv") # noqa: E501
+# test_df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/holdout.csv") # noqa: E501
 
 # df["tag"] = 0
 # test_df["tag"] = 2

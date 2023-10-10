@@ -21,3 +21,4 @@ docker-compose.yml
 Dockerfile.dev
 *.log
 lightning_logs/
+llm_checkpoints/

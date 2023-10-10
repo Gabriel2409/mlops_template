@@ -8,7 +8,7 @@ isort
 jupyter
 jupyterlab
 jupyterlab_server
-kedro~=0.18.12
+kedro~=0.18.13
 kedro-azureml
 # git+https://github.com/Gabriel2409/kedro-azureml.git@feature/export-job-name-for-cicd
 kedro-docker~=0.3.1

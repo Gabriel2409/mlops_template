@@ -13,6 +13,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
+from kedro_azureml.distributed import distributed_job
+from kedro_azureml.distributed.config import Framework
 from lightning.pytorch.loggers import MLFlowLogger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
@@ -241,6 +243,7 @@ class FinetunedLlmModule(L.LightningModule):
         }
 
 
+# @distributed_job(Framework.PyTorch, num_nodes="params:finetuned_llm_config.num_nodes")
 def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
     num_classes = len(label_encoder_mapping)
     batch_size = int(config["batch_size"])
@@ -251,6 +254,7 @@ def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
     num_epochs = int(config["num_epochs"])
     checkpoint_dir = config["checkpoint_dir"]
     resume_checkpoint_from = config["resume_checkpoint_from"]
+    num_nodes = int(config["num_nodes"])  # noqa: F841
 
     datamodule = TokenizedDataModule(
         train_val_df=train_val_df,

@@ -30,12 +30,13 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs={
                     "train_val_df": "encoded_train_df",
                     "test_df": "encoded_test_df",
+                    # when changing config, we must also modify train_llm_classifier
                     "config": "params:finetuned_llm_config",
                     "label_encoder_mapping": "label_encoder_mapping",
                 },
                 outputs="pytorch_classifier_mlflow",
                 name="train_llm_classifier",
-                tags=["gpu"],
+                # tags=["gpu"],
             )
         ]
     )

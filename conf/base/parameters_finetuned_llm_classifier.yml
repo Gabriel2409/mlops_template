@@ -14,3 +14,6 @@ finetuned_llm_config:
   checkpoint_dir: llm_checkpoints/
   # path to checkpoint file to use to resume training. Set to null to start from scratch
   resume_checkpoint_from: null
+  num_nodes: 2 # distributed training
+
+

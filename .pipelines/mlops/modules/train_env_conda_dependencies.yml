@@ -6,7 +6,7 @@ dependencies:
   - pip:
       - azureml-core~=1.52.0
       - azureml-mlflow~=1.52.0
-      - kedro~=0.18.12
+      - kedro~=0.18.13
       - kedro-azureml>=0.6.0
       - kedro-docker~=0.3.1
       - kedro-mlflow~=0.11.9

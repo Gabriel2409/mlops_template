@@ -1,0 +1,19 @@
+# This is a boilerplate parameters config generated for pipeline 'finetuned_llm_classifier'
+# using Kedro 0.18.13.
+#
+# Documentation for this file format can be found in "Parameters"
+# Link: https://docs.kedro.org/en/0.18.13/configuration/parameters.html
+
+finetuned_llm_config:
+  dropout_p: 0.5
+  lr: 1e-4
+  lr_factor: 0.8
+  lr_patience: 3
+  num_epochs: 10
+  batch_size: 32
+  checkpoint_dir: llm_checkpoints/
+  # path to checkpoint file to use to resume training. Set to null to start from scratch
+  resume_checkpoint_from: null
+  num_nodes: 1 # distributed training
+
+

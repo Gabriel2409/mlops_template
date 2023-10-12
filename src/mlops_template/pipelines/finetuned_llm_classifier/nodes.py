@@ -16,9 +16,14 @@ import torchmetrics
 from kedro_azureml.distributed import distributed_job
 from kedro_azureml.distributed.config import Framework
 from lightning.pytorch.loggers import MLFlowLogger
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from transformers import BertModel, BertTokenizer
+
+from mlops_template.pipelines.log_sklearn_metrics.nodes import (
+    format_classification_report,
+)
 
 from .stopwords import STOPWORDS
 
@@ -208,23 +213,49 @@ class FinetunedLlmModule(L.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         z = self(batch)
-        targets = F.one_hot(batch["targets"], num_classes=self.num_classes).float()
-        loss = self.loss_fn(z, targets)
+        onehot_targets = F.one_hot(
+            batch["targets"], num_classes=self.num_classes
+        ).float()
+        loss = self.loss_fn(z, onehot_targets)
         self.log("val_loss", loss)
         self.accuracy(z, batch["targets"])
         self.f1_macro(z, batch["targets"])
         self.log("val_acc", self.accuracy)
         self.log("val_f1_macro", self.f1_macro)
+        return {"val_loss": loss}
 
     def test_step(self, batch, batch_idx):
         z = self(batch)
-        targets = F.one_hot(batch["targets"], num_classes=self.num_classes).float()
-        loss = self.loss_fn(z, targets)
-        self.log("test_loss", loss)
-        self.accuracy(z, batch["targets"])
-        self.f1_macro(z, batch["targets"])
-        self.log("test_acc", self.accuracy)
-        self.log("test_f1_macro", self.f1_macro)
+        onehot_targets = F.one_hot(
+            batch["targets"], num_classes=self.num_classes
+        ).float()
+        loss = self.loss_fn(z, onehot_targets)
+
+        if batch_idx == 0:
+            self.test_step_outputs = []
+
+        predicted_probs = F.softmax(z, dim=1)
+        predicted_labels = torch.argmax(predicted_probs, dim=1)
+        predicted_labels = predicted_labels.cpu().numpy()
+        output = {
+            "test_loss": loss,
+            "y_true": batch["targets"].cpu().numpy(),
+            "y_pred": predicted_labels,
+        }
+
+        self.test_step_outputs.append(output)
+        return output
+
+    def on_test_epoch_end(self):
+        all_y_true = np.concatenate(
+            [output["y_true"] for output in self.test_step_outputs]
+        )
+        all_y_pred = np.concatenate(
+            [output["y_pred"] for output in self.test_step_outputs]
+        )
+        self.classification_report = classification_report(
+            all_y_true, all_y_pred, output_dict=True
+        )
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
@@ -243,7 +274,7 @@ class FinetunedLlmModule(L.LightningModule):
         }
 
 
-# @distributed_job(Framework.PyTorch, num_nodes="params:finetuned_llm_config.num_nodes")
+@distributed_job(Framework.PyTorch, num_nodes="params:finetuned_llm_config.num_nodes")
 def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
     num_classes = len(label_encoder_mapping)
     batch_size = int(config["batch_size"])
@@ -298,10 +329,19 @@ def train_llm_classifier(train_val_df, test_df, config, label_encoder_mapping):
         max_epochs=num_epochs,
         logger=mlflow_logger,
         # callbacks=[ProgressBar()],
+        num_nodes=num_nodes,
         log_every_n_steps=5,
     )
     trainer.fit(model, datamodule)
-    return model
+    return model, datamodule
+
+
+def evaluate_model(model, datamodule):
+    trainer = L.Trainer(
+        log_every_n_steps=5,
+    )
+    trainer.test(model, datamodule)
+    return model, format_classification_report(model.classification_report)
 
 
 # df = pd.read_csv("https://raw.githubusercontent.com/GokuMohandas/Made-With-ML/main/datasets/dataset.csv") # noqa: E501

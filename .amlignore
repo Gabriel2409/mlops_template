@@ -1,3 +1,5 @@
+.pipelines/
+cicd/
 .git/
 .github/
 .pytest_cache

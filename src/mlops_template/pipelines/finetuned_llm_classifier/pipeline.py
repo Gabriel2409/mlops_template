@@ -8,7 +8,7 @@ from kedro.pipeline.modular_pipeline import pipeline
 
 from mlops_template.pipelines import encode_tag
 
-from .nodes import train_llm_classifier
+from .nodes import evaluate_model, train_llm_classifier
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -26,6 +26,8 @@ def create_pipeline(**kwargs) -> Pipeline:
     ) + Pipeline(
         nodes=[
             node(
+                # distributed node, important that outputs are not saved to avoid
+                # saving multiple times
                 func=train_llm_classifier,
                 inputs={
                     "train_val_df": "encoded_train_df",
@@ -34,9 +36,19 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "config": "params:finetuned_llm_config",
                     "label_encoder_mapping": "label_encoder_mapping",
                 },
-                outputs="pytorch_classifier_mlflow",
+                outputs=["pytorch_classifier", "lightning_datamodule"],
                 name="train_llm_classifier",
-                # tags=["gpu"],
-            )
+                tags=["gpu"],
+                # tags=["small_cpu"],
+            ),
+            node(
+                func=evaluate_model,
+                inputs=["pytorch_classifier", "lightning_datamodule"],
+                outputs=[
+                    "pytorch_classifier_mlflow",
+                    "test_classification_report_mlflow",
+                ],
+                name="evaluate_llm_classifier",
+            ),
         ]
     )

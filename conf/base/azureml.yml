@@ -8,7 +8,7 @@ azure:
   # Azure ML Workspace name
   workspace_name: "mlw-mlopstpl-4877prod"
   # Azure ML Environment to use during pipeline execution
-  environment_name: mlops-tpl-train-env@latest
+  environment_name: mlops-tpl-train-env-gpu@latest
   # Path to directory to upload, or null to disable code upload
   code_directory: .
   # Path to the directory in the Docker image to run the code from
@@ -37,6 +37,8 @@ azure:
       cluster_name: "cpu-cluster"
     gpu:
       cluster_name: "gpu-cluster"
+    small_cpu:
+      cluster_name: "cpu-cluster-small"
     # <your_node_tag>:
     #   cluster_name: "<your_cluster_name>"
 docker:
